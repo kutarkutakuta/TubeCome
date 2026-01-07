@@ -232,3 +232,42 @@ a:hover {
   color: var(--accent-active-fg);
 }
 
+/* YouTube-styled button */
+.yt-btn {
+  background-color: #ff0000 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  width: 100%;
+  box-shadow: none;
+  text-decoration: none;
+}
+.yt-btn:hover {
+  background-color: #e60000 !important;
+}
+.yt-btn .anticon {
+  color: #ffffff !important;
+  margin-right: 6px;
+}
+.yt-btn:active {
+  transform: translateY(1px);
+}
+
+/* Owner prefix badge (うｐ主) */
+.owner-prefix {
+  background: #ffecec;
+  color: #b91c1c;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(189,34,34,0.12);
+  font-size: 12px;
+  display: inline-block;
+  margin-right: 6px;
+}
+

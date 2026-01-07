@@ -103,6 +103,7 @@ export async function getVideoDetails(id: string) {
       title: snippet?.title || '',
       description: snippet?.description || '',
       thumbnail: snippet?.thumbnails?.high?.url || snippet?.thumbnails?.default?.url || '',
+      channelId: snippet?.channelId || '',
       channelTitle: snippet?.channelTitle || '',
       publishedAt: snippet?.publishedAt || '',
       duration: cd?.duration || '',

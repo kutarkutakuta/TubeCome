@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getVideoStatistics } from '@/lib/youtube';
 import PrefetchStats from '@/components/PrefetchStats';
+import { YoutubeOutlined } from '@ant-design/icons';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -29,7 +30,7 @@ export default async function ChannelPage({ params }: Props) {
     const feedTitleMatch = text.match(/<title>([^<]+)<\/title>/);
     const feedTitle = feedTitleMatch ? feedTitleMatch[1] : id;
 
-    const entries: Array<{ id: string; title: string; published: string; link: string; thumbnail?: string; description?: string; durationSeconds?: string; author?: string }> = [];
+    let entries: Array<{ id: string; title: string; published: string; link: string; thumbnail?: string; description?: string; durationSeconds?: string; author?: string }> = [];
     const entryRe = /<entry>([\s\S]*?)<\/entry>/g;
     let m;
     const authorRe = /<author>[\s\S]*?<name>(.*?)<\/name>[\s\S]*?<\/author>/;
@@ -56,6 +57,16 @@ export default async function ChannelPage({ params }: Props) {
       return `${mm}:${ss.toString().padStart(2, '0')}`;
     }
 
+    // Sort entries by published date (newest first) and keep recent 50
+    entries.sort((a, b) => {
+      const ta = a.published ? new Date(a.published).getTime() : 0;
+      const tb = b.published ? new Date(b.published).getTime() : 0;
+      return tb - ta;
+    });
+
+    // Limit to most recent 50 items (RSS may include many)
+    entries = entries.slice(0, 50);
+
     // Fetch stats for first 5 videos (SSR) to avoid extra client requests
     const firstIds = entries.slice(0, 5).map(e => e.id);
     const statsMap = firstIds.length > 0 ? await getVideoStatistics(firstIds) : {};
@@ -77,18 +88,26 @@ export default async function ChannelPage({ params }: Props) {
             const s = statsMap[v.id];
             return (
               <div key={v.id} className="win-window win-inset p-3 flex items-start gap-3">
-                <div className="w-24 h-14 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]">
-                  <Image
-                    src={v.thumbnail ?? `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}
-                    alt={`サムネイル: ${v.title}`}
-                    width={160}
-                    height={90}
-                    className="object-cover w-full h-full"
-                  />
+                <div className="w-24">
+                  <div className="h-14 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]">
+                    <Image
+                      src={v.thumbnail ?? `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}
+                      alt={`サムネイル: ${v.title}`}
+                      width={160}
+                      height={90}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <div className="mt-2 text-center">
+                    <a className="win-btn text-xs block flex items-center justify-center yt-btn" href={v.link} target="_blank" rel="noreferrer">
+                      <YoutubeOutlined style={{ marginRight: 6 }} />
+                      <span>YouTube</span>
+                    </a>
+                  </div>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
-                    <div className="text-sm font-bold">{v.title}</div>
+                    <Link href={`/videos/${v.id}`} className="text-sm font-bold text-[var(--fg-primary)] line-clamp-2">{v.title}</Link>
                     {v.durationSeconds && (
                       <div className="text-[10px] bg-[var(--bg-panel)] px-1 rounded text-[var(--fg-secondary)]">{formatDuration(v.durationSeconds)}</div>
                     )}
@@ -102,10 +121,7 @@ export default async function ChannelPage({ params }: Props) {
                     <div className="text-xs text-[var(--fg-secondary)] mt-2">再生数: {s.viewCount?.toLocaleString() ?? '—'}{s.commentCount ? ` • コメント: ${s.commentCount.toLocaleString()}` : ''}{s.likeCount ? ` • 高評価: ${s.likeCount.toLocaleString()}` : ''}</div>
                   )}
 
-                  <div className="mt-3 flex gap-2">
-                    <a className="win-btn text-xs" href={v.link} target="_blank" rel="noreferrer">Watch</a>
-                    <Link href={`/videos/${v.id}`} className="win-btn text-xs">Open</Link>
-                  </div>
+
                 </div>
               </div>
             );

@@ -26,32 +26,36 @@ export default function FavoritesList() {
     let mountedFlag = true;
     setMounted(true);
 
-    async function load() {
+    async function refreshFavorites() {
       const data = await fetchFavorites();
       // Resolve missing titles for UC ids
       const toResolve = data.filter((d:any) => (!d.title || d.title === d.id) && /^UC[0-9A-Za-z_-]{20,}$/.test(d.id));
-      for (const item of toResolve) {
-        try {
-          const res = await fetch('/api/resolve-channel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ input: item.id }) });
-          if (res.ok) {
-            const json = await res.json();
-            const title = json.channelTitle;
-            if (title) {
-              // update IndexedDB
-              await import('@/utils/indexeddb').then(m => m.addFavorite(item.id, title));
+      if (toResolve.length > 0) {
+        for (const item of toResolve) {
+          try {
+            const res = await fetch('/api/resolve-channel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ input: item.id }) });
+            if (res.ok) {
+              const json = await res.json();
+              const title = json.channelTitle;
+              if (title) {
+                // update IndexedDB
+                await import('@/utils/indexeddb').then(m => m.addFavorite(item.id, title));
+              }
             }
+          } catch (e) {
+            // ignore resolution errors
           }
-        } catch (e) {
-          // ignore resolution errors
         }
       }
       const refreshed = await fetchFavorites();
       if (mountedFlag) setFavorites(refreshed);
     }
-    load();
+    // initial load
+    refreshFavorites();
 
     function onChange() {
-      fetchFavorites().then(data => setFavorites(data));
+      // refresh and resolve missing titles when favorites change
+      refreshFavorites();
     }
     window.addEventListener('favorites-changed', onChange);
     return () => { mountedFlag = false; window.removeEventListener('favorites-changed', onChange); };
@@ -76,7 +80,6 @@ export default function FavoritesList() {
                   }
                   const data = await fetchFavorites();
                   setFavorites(data);
-                  window.dispatchEvent(new CustomEvent('favorites-changed'));
                 }}
              >
                <Button type="text" danger icon={<DeleteOutlined />} size="small"></Button>

@@ -27,23 +27,25 @@ export default async function VideoPage({ params }: Props) {
     const commentsResp = await getCommentThreads({ videoId: id, maxResults: 100 });
 
     // normalize threads into flat array: root then replies
-    const posts: Array<{ id: string; author: string; text: string; publishedAt: string; likeCount?: number; isReply?: boolean; shortId?: string; isDeleted?: boolean }> = [];
+    const posts: Array<{ id: string; author: string; authorChannelId?: string; text: string; publishedAt: string; likeCount?: number; isReply?: boolean; shortId?: string; isDeleted?: boolean }> = [];
 
     for (const thread of commentsResp.items || []) {
       const top = thread.snippet?.topLevelComment?.snippet;
       if (top) {
         const text = top.textDisplay ?? '';
-        const shortId = (top.authorChannelId?.value || thread.id || '').toString().slice(0, 8);
+        const authorChannelId = top.authorChannelId?.value;
+        const shortId = (authorChannelId || thread.id || '').toString().slice(0, 8);
         const isDeleted = !text || /removed|deleted|削除|This comment has been removed/i.test(text);
-        posts.push({ id: thread.id as string, author: top.authorDisplayName || '名無しさん', text: text, publishedAt: top.publishedAt || '', likeCount: typeof top.likeCount === 'number' ? top.likeCount : undefined, shortId, isDeleted });
+        posts.push({ id: thread.id as string, author: top.authorDisplayName || '名無しさん', authorChannelId, text: text, publishedAt: top.publishedAt || '', likeCount: typeof top.likeCount === 'number' ? top.likeCount : undefined, shortId, isDeleted });
       }
       const replies = thread.replies?.comments || [];
       for (const r of replies) {
         const rs = r.snippet;
         const text = rs?.textDisplay ?? '';
-        const shortId = (rs?.authorChannelId?.value || r.id || '').toString().slice(0, 8);
+        const authorChannelId = rs?.authorChannelId?.value;
+        const shortId = (authorChannelId || r.id || '').toString().slice(0, 8);
         const isDeleted = !text || /removed|deleted|削除|This comment has been removed/i.test(text);
-        posts.push({ id: r.id as string, author: rs?.authorDisplayName || '名無しさん', text: text, publishedAt: rs?.publishedAt || '', likeCount: typeof rs?.likeCount === 'number' ? rs?.likeCount : undefined, isReply: true, shortId, isDeleted });
+        posts.push({ id: r.id as string, author: rs?.authorDisplayName || '名無しさん', authorChannelId, text: text, publishedAt: rs?.publishedAt || '', likeCount: typeof rs?.likeCount === 'number' ? rs?.likeCount : undefined, isReply: true, shortId, isDeleted });
       }
     }
 
@@ -113,7 +115,16 @@ export default async function VideoPage({ params }: Props) {
             return (
               <div key={p.id} id={`post-${num}`} className="mb-6 break-words font-mono">
                 <div className="mb-2 text-sm text-[var(--fg-secondary)]">
-                  {num} : <span className="font-bold text-[var(--fg-primary)]">{p.author}</span> : {formatDate(p.publishedAt)} ID:{p.shortId}
+                  {num} : 
+                  <span className="font-bold text-[var(--fg-primary)]">
+                    {p.authorChannelId && p.authorChannelId === details.channelId ? (
+                      <span className="owner-prefix">うｐ主</span>
+                    ) : (
+                      <span className="text-[var(--fg-secondary)]">名無しさん</span>
+                    )}
+                    {p.author ? <span className="ml-1">{p.author}</span> : null}
+                  </span>
+                  {' '} : {formatDate(p.publishedAt)} ID:{p.shortId}
                 </div>
                 <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed">
                   {renderCommentText(p.text)}

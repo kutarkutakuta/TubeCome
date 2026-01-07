@@ -30,7 +30,6 @@ export default function AddChannelForm() {
       await idbAddFavorite(channelId, channelTitle);
       message.success(`登録しました: ${channelTitle}`);
       form.resetFields();
-      window.dispatchEvent(new CustomEvent('favorites-changed'));
     } catch (err) {
       message.error(String(err));
     } finally {
