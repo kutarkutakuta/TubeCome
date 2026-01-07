@@ -187,12 +187,15 @@ export default async function VideoPage({ params }: Props) {
                       ) : (
                         <span className="text-[var(--fg-secondary)]">名無しさん</span>
                       )}
-                      {p.author ? <span className="ml-1">{p.author}</span> : null}
+                      {p.author ? (
+                        authorTotal > 1 ? (
+                          <AuthorPostsPreview items={items} authorIndex={authorIndex} authorTotal={authorTotal} authorName={p.author} />
+                        ) : (
+                          <span className="ml-1">{p.author}</span>
+                        )
+                      ) : null}
                     </span>
-                    {' '} : {formatDate(p.publishedAt)} ID:{p.shortId}
-                    {authorTotal > 1 ? (
-                      <AuthorPostsPreview items={items} authorIndex={authorIndex} authorTotal={authorTotal} />
-                    ) : null}
+                    {' '} : {formatDate(p.publishedAt)}
                   <span className="ml-2 vote-badges">
                     {typeof p.likeCount === 'number' && p.likeCount > 0 ? (
                       <span className="vote-badge like"><LikeOutlined className="anticon" /><span className="vote-count">{p.likeCount.toLocaleString()}</span></span>
