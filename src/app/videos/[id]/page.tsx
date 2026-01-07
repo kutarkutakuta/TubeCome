@@ -27,7 +27,7 @@ export default async function VideoPage({ params }: Props) {
     const commentsResp = await getCommentThreads({ videoId: id, maxResults: 100 });
 
     // normalize threads into flat array: root then replies
-    const posts: Array<{ id: string; author: string; authorChannelId?: string; text: string; publishedAt: string; likeCount?: number; isReply?: boolean; shortId?: string; isDeleted?: boolean }> = [];
+    const posts: Array<{ id: string; author: string; authorChannelId?: string; parentId?: string; text: string; publishedAt: string; likeCount?: number; isReply?: boolean; shortId?: string; isDeleted?: boolean }> = [];
 
     for (const thread of commentsResp.items || []) {
       const top = thread.snippet?.topLevelComment?.snippet;
@@ -45,9 +45,16 @@ export default async function VideoPage({ params }: Props) {
         const authorChannelId = rs?.authorChannelId?.value;
         const shortId = (authorChannelId || r.id || '').toString().slice(0, 8);
         const isDeleted = !text || /removed|deleted|削除|This comment has been removed/i.test(text);
-        posts.push({ id: r.id as string, author: rs?.authorDisplayName || '名無しさん', authorChannelId, text: text, publishedAt: rs?.publishedAt || '', likeCount: typeof rs?.likeCount === 'number' ? rs?.likeCount : undefined, isReply: true, shortId, isDeleted });
+        posts.push({ id: r.id as string, author: rs?.authorDisplayName || '名無しさん', authorChannelId, parentId: thread.id, text: text, publishedAt: rs?.publishedAt || '', likeCount: typeof rs?.likeCount === 'number' ? rs?.likeCount : undefined, isReply: true, shortId, isDeleted });
       }
     }
+
+    // Sort posts by published date (oldest first)
+    posts.sort((a, b) => {
+      const ta = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+      const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+      return ta - tb;
+    });
 
     function formatDate(iso?: string) {
       if (!iso) return '';
@@ -101,39 +108,72 @@ export default async function VideoPage({ params }: Props) {
             <div className="win-window win-inset p-4">コメントが見つかりませんでした。</div>
           )}
 
-          {posts.map((p, idx) => {
-            const num = idx + 1;
-            
-            if (p.isDeleted) {
-              return (
-                <div key={p.id} id={`post-${num}`} className="mb-6">
-                  <div className="text-[var(--fg-secondary)]">{num} : <span className="font-bold">【あぼーん】</span></div>
-                </div>
-              );
+          {(() => {
+            // Group replies under their parent and create a display order
+            const byParent = new Map<string, typeof posts[0][]>();
+            for (const p of posts) {
+              if (p.parentId) {
+                const arr = byParent.get(p.parentId) || [];
+                arr.push(p);
+                byParent.set(p.parentId, arr);
+              }
+            }
+            // sort replies by publishedAt ascending
+            for (const arr of byParent.values()) {
+              arr.sort((a, b) => (new Date(a.publishedAt).getTime() || 0) - (new Date(b.publishedAt).getTime() || 0));
             }
 
-            return (
-              <div key={p.id} id={`post-${num}`} className="mb-6 break-words font-mono">
-                <div className="mb-2 text-sm text-[var(--fg-secondary)]">
-                  {num} : 
-                  <span className="font-bold text-[var(--fg-primary)]">
-                    {p.authorChannelId && p.authorChannelId === details.channelId ? (
-                      <span className="owner-prefix">うｐ主</span>
-                    ) : (
-                      <span className="text-[var(--fg-secondary)]">名無しさん</span>
-                    )}
-                    {p.author ? <span className="ml-1">{p.author}</span> : null}
-                  </span>
-                  {' '} : {formatDate(p.publishedAt)} ID:{p.shortId}
-                </div>
-                <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed">
-                  {renderCommentText(p.text)}
-                </div>
-                {typeof p.likeCount === 'number' && p.likeCount > 0 && <div className="ml-4 mt-1 text-xs text-[var(--fg-secondary)]">（いいね: {p.likeCount}）</div>}
-              </div>
-            );
-          })}
+            const topLevel = posts.filter((p) => !p.parentId).sort((a, b) => (new Date(a.publishedAt).getTime() || 0) - (new Date(b.publishedAt).getTime() || 0));
+            const display: typeof posts = [];
+            for (const t of topLevel) {
+              display.push(t);
+              const replies = byParent.get(t.id) || [];
+              for (const r of replies) display.push(r);
+            }
 
+            const idToIndex = new Map(display.map((p, i) => [p.id, i + 1]));
+
+            return display.map((p, idx) => {
+              const num = idx + 1;
+
+              if (p.isDeleted) {
+                return (
+                  <div key={p.id} id={`post-${num}`} className="mb-6">
+                    <div className="text-[var(--fg-secondary)]">{num} : <span className="font-bold">【あぼーん】</span></div>
+                  </div>
+                );
+              }
+
+              const parentNum = p.parentId ? idToIndex.get(p.parentId) : undefined;
+
+              return (
+                <div key={p.id} id={`post-${num}`} className="mb-6 break-words font-mono">
+                  <div className="mb-2 text-sm text-[var(--fg-secondary)]">
+                    {num} : 
+                    <span className="font-bold text-[var(--fg-primary)]">
+                      {p.authorChannelId && p.authorChannelId === details.channelId ? (
+                        <span className="owner-prefix">うｐ主</span>
+                      ) : (
+                        <span className="text-[var(--fg-secondary)]">名無しさん</span>
+                      )}
+                      {p.author ? <span className="ml-1">{p.author}</span> : null}
+                    </span>
+                    {' '} : {formatDate(p.publishedAt)} ID:{p.shortId}
+                  </div>
+                  <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed">
+                    {typeof parentNum === 'number' && (
+                      <>
+                        <a href={`#post-${parentNum}`} className="text-blue-600 underline">&gt;&gt;{parentNum}</a>
+                        <br />
+                      </>
+                    )}
+                    {renderCommentText(p.text)}
+                  </div>
+                  {typeof p.likeCount === 'number' && p.likeCount > 0 && <div className="ml-4 mt-1 text-xs text-[var(--fg-secondary)]">（いいね: {p.likeCount}）</div>}
+                </div>
+              );
+            });
+          })()}
           <div className="mt-4 text-right text-xs"><a href="#top" className="text-[var(--fg-secondary)]">トップへ</a></div>
         </div>
       </div>
