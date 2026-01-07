@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-
+import { List, Button, Popconfirm } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 import { getAllFavorites, removeFavorite as idbRemoveFavorite } from '@/utils/indexeddb';
 
 async function fetchFavorites() {
@@ -56,37 +57,18 @@ export default function FavoritesList() {
     return () => { mountedFlag = false; window.removeEventListener('favorites-changed', onChange); };
   }, []);
 
-  if (!mounted) {
-    return (
-      <div className="mt-4 win-window">
-        <div className="win-title-bar">お気に入りチャンネル</div>
-        <div className="p-2 win-inset text-xs text-[var(--fg-secondary)]">ロード中…</div>
-      </div>
-    );
-  }
-
-  if (!favorites || favorites.length === 0) {
-    return (
-      <div className="mt-4 win-window">
-        <div className="win-title-bar">お気に入りチャンネル</div>
-        <div className="p-2 win-inset text-xs text-[var(--fg-secondary)]">お気に入りに登録したチャンネルがここに表示されます。</div>
-      </div>
-    );
-  }
+  if (!mounted) return null;
 
   return (
-    <div className="mt-4 win-window">
-      <div className="win-title-bar">お気に入りチャンネル</div>
-      <div className="p-2 win-inset text-sm">
-        <ul className="space-y-2">
-          {favorites.map((ch) => (
-            <li key={ch.id} className="flex items-center justify-between">
-              <Link href={`/channel/${encodeURIComponent(ch.id)}`} className="text-[var(--fg-primary)]">
-                {ch.title || ch.id}
-              </Link>
-              <button
-                className="win-btn text-xs"
-                onClick={async () => {
+    <List
+      dataSource={favorites}
+      renderItem={(ch) => (
+        <List.Item
+          actions={[
+             <Popconfirm 
+                key="del"
+                title="削除しますか？" 
+                onConfirm={async () => {
                   try {
                     await idbRemoveFavorite(ch.id);
                   } catch (e) {
@@ -96,13 +78,17 @@ export default function FavoritesList() {
                   setFavorites(data);
                   window.dispatchEvent(new CustomEvent('favorites-changed'));
                 }}
-              >
-                削除
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+             >
+               <Button type="text" danger icon={<DeleteOutlined />} size="small"></Button>
+             </Popconfirm>
+          ]}
+        >
+          <List.Item.Meta
+            title={<Link href={`/channel/${encodeURIComponent(ch.id)}`}>{ch.title || ch.id}</Link>}
+          />
+        </List.Item>
+      )}
+      locale={{ emptyText: 'お気に入りに登録したチャンネルがここに表示されます。' }}
+    />
   );
 }

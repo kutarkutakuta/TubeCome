@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
+import { FloatButton, Drawer } from 'antd';
+import { PlusOutlined, StarOutlined } from '@ant-design/icons';
 import AddChannelForm from './AddChannelForm';
 import FavoritesList from './FavoritesList';
 
@@ -10,56 +12,30 @@ export default function MobileActions() {
 
   return (
     <>
-      <div className="md:hidden fixed bottom-20 right-3 z-50 flex flex-col gap-2">
-        <button
-          aria-label="チャンネル登録を開く"
-          onClick={() => setShowAdd(true)}
-          className="win-btn w-12 h-12 flex items-center justify-center"
-        >
-          ＋
-        </button>
-        <button
-          aria-label="お気に入りを開く"
-          onClick={() => setShowFav(true)}
-          className="win-btn w-12 h-12 flex items-center justify-center"
-        >
-          ★
-        </button>
-      </div>
+      <FloatButton.Group shape="circle" style={{ right: 24, bottom: 84 }}>
+        <FloatButton icon={<StarOutlined />} onClick={() => setShowFav(true)} />
+        <FloatButton icon={<PlusOutlined />} type="primary" onClick={() => setShowAdd(true)} />
+      </FloatButton.Group>
 
-      {showAdd && (
-        <div className="fixed inset-0 z-50 flex items-end md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowAdd(false)} />
-          <div className="w-full p-4">
-            <div className="win-window win-inset p-2">
-              <div className="win-title-bar flex justify-between">
-                <span>チャンネル登録</span>
-                <button className="win-btn w-6 h-6" onClick={() => setShowAdd(false)}>×</button>
-              </div>
-              <div className="p-2">
-                <AddChannelForm />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Drawer
+        title="チャンネル登録"
+        placement="bottom"
+        onClose={() => setShowAdd(false)}
+        open={showAdd}
+        height="auto"
+      >
+        <AddChannelForm />
+      </Drawer>
 
-      {showFav && (
-        <div className="fixed inset-0 z-50 flex items-end md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowFav(false)} />
-          <div className="w-full p-4">
-            <div className="win-window win-inset p-2">
-              <div className="win-title-bar flex justify-between">
-                <span>お気に入りチャンネル</span>
-                <button className="win-btn w-6 h-6" onClick={() => setShowFav(false)}>×</button>
-              </div>
-              <div className="p-2">
-                <FavoritesList />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Drawer
+        title="お気に入りチャンネル"
+        placement="bottom"
+        onClose={() => setShowFav(false)}
+        open={showFav}
+        height="60vh"
+      >
+        <FavoritesList />
+      </Drawer>
     </>
   );
 }
