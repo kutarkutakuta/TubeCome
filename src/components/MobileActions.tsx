@@ -22,7 +22,6 @@ export default function MobileActions() {
         placement="bottom"
         onClose={() => setShowAdd(false)}
         open={showAdd}
-        height="auto"
       >
         <AddChannelForm />
       </Drawer>
@@ -32,7 +31,6 @@ export default function MobileActions() {
         placement="bottom"
         onClose={() => setShowFav(false)}
         open={showFav}
-        height="60vh"
       >
         <FavoritesList />
       </Drawer>

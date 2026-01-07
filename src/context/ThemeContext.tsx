@@ -12,7 +12,8 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('retro');
+  // Default to match server-rendered `data-theme='modern'` to avoid hydration mismatch
+  const [theme, setTheme] = useState<Theme>('modern');
 
   useEffect(() => {
     // Check local storage or system preference on mount if needed

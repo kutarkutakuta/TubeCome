@@ -41,7 +41,7 @@ export default function VideoCard({ v }: { v: Video }) {
   }
 
   return (
-    <Card size="small" style={{ marginBottom: 16 }} bodyStyle={{ padding: 12 }}>
+    <Card size="small" style={{ marginBottom: 16 }}>
       <div className="flex items-start gap-3">
         <div className="w-20 h-12 md:w-28 md:h-16 bg-gray-200 flex items-center justify-center text-xs text-gray-500 rounded font-mono">
           サムネ
