@@ -93,7 +93,7 @@ export default async function ChannelPage({ params }: Props) {
                       <div className="text-[10px] bg-[var(--bg-panel)] px-1 rounded text-[var(--fg-secondary)]">{formatDuration(v.durationSeconds)}</div>
                     )}
                   </div>
-                  <div className="text-xs text-[var(--fg-secondary)] mt-1">{v.author ? `投稿者: ${v.author} • ` : ''}{new Date(v.published).toLocaleString()}</div>
+                  <div className="text-xs text-[var(--fg-secondary)] mt-1">{v.author ? `投稿者: ${v.author} • ` : ''}{new Date(v.published).toLocaleString('ja-JP')}</div>
                   {v.description && (
                     <div className="text-xs mt-2 text-[var(--fg-secondary)]">{v.description.length > 140 ? `${v.description.slice(0, 140)}…` : v.description}</div>
                   )}

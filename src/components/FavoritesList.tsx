@@ -19,9 +19,12 @@ async function fetchFavorites() {
 
 export default function FavoritesList() {
   const [favorites, setFavorites] = useState<Array<{id:string,title?:string}>>([]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
+    let mountedFlag = true;
+    setMounted(true);
+
     async function load() {
       const data = await fetchFavorites();
       // Resolve missing titles for UC ids
@@ -42,7 +45,7 @@ export default function FavoritesList() {
         }
       }
       const refreshed = await fetchFavorites();
-      if (mounted) setFavorites(refreshed);
+      if (mountedFlag) setFavorites(refreshed);
     }
     load();
 
@@ -50,8 +53,17 @@ export default function FavoritesList() {
       fetchFavorites().then(data => setFavorites(data));
     }
     window.addEventListener('favorites-changed', onChange);
-    return () => { mounted = false; window.removeEventListener('favorites-changed', onChange); };
+    return () => { mountedFlag = false; window.removeEventListener('favorites-changed', onChange); };
   }, []);
+
+  if (!mounted) {
+    return (
+      <div className="mt-4 win-window">
+        <div className="win-title-bar">お気に入りチャンネル</div>
+        <div className="p-2 win-inset text-xs text-[var(--fg-secondary)]">ロード中…</div>
+      </div>
+    );
+  }
 
   if (!favorites || favorites.length === 0) {
     return (

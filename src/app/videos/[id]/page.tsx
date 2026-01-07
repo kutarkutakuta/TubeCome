@@ -78,7 +78,7 @@ export default async function VideoPage({ params }: Props) {
       <div className="p-4 max-w-3xl mx-auto">
         <div className="win-window win-title-bar mb-4">
           <div className="text-lg font-bold">{details.title}</div>
-          <div className="text-xs text-[var(--fg-secondary)]">{details.channelTitle} • {new Date(details.publishedAt).toLocaleString()}</div>
+          <div className="text-xs text-[var(--fg-secondary)]">{details.channelTitle} • {new Date(details.publishedAt).toLocaleString('ja-JP')}</div>
         </div>
 
         <div className="win-window p-3 mb-4">
