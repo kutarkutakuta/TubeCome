@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
 import { LikeOutlined, DislikeOutlined } from '@ant-design/icons';
 import AuthorPostsPreview from '@/components/AuthorPostsPreview';
+import ReplyPreview from '@/components/ReplyPreview';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -116,34 +117,12 @@ export default async function VideoPage({ params }: Props) {
           )}
 
           {(() => {
-            // Group replies under their parent and create a display order
-            const byParent = new Map<string, typeof posts[0][]>();
-            for (const p of posts) {
-              if (p.parentId) {
-                const arr = byParent.get(p.parentId) || [];
-                arr.push(p);
-                byParent.set(p.parentId, arr);
-              }
-            }
-            // sort replies by publishedAt ascending
-            for (const arr of byParent.values()) {
-              arr.sort((a, b) => (new Date(a.publishedAt).getTime() || 0) - (new Date(b.publishedAt).getTime() || 0));
-            }
-
-            const topLevel = posts.filter((p) => !p.parentId).sort((a, b) => (new Date(a.publishedAt).getTime() || 0) - (new Date(b.publishedAt).getTime() || 0));
-            const display: typeof posts = [];
-            for (const t of topLevel) {
-              display.push(t);
-              const replies = byParent.get(t.id) || [];
-              for (const r of replies) display.push(r);
-            }
-
             // Build chronological mapping (oldest-first)
             const chrono = [...posts].sort((a, b) => (new Date(a.publishedAt).getTime() || 0) - (new Date(b.publishedAt).getTime() || 0));
             const chronMap = new Map(chrono.map((p, i) => [p.id, i + 1]));
 
             // Build per-author chronological lists (for this video)
-            const authorGroups = new Map<string, string[]>();
+            const authorGroups = new Map() as Map<string, string[]>;
             for (const p of chrono) {
               const key = p.authorChannelId || p.shortId || p.author || p.id;
               const arr = authorGroups.get(key) || [];
@@ -151,7 +130,7 @@ export default async function VideoPage({ params }: Props) {
               authorGroups.set(key, arr);
             }
 
-            return display.map((p) => {
+            return chrono.map((p) => {
               const num = chronMap.get(p.id) || 0;
 
               if (p.isDeleted) {
@@ -163,6 +142,11 @@ export default async function VideoPage({ params }: Props) {
               }
 
               const parentNum = p.parentId ? chronMap.get(p.parentId) : undefined;
+              const parentObj = p.parentId ? posts.find(x => x.id === p.parentId) : undefined;
+              const parentSnippet = parentObj ? (parentObj.text || '').replace(/\n/g, ' ').slice(0, 240) : undefined;
+              const parentAuthor = parentObj?.author;
+              const parentPublishedAt = parentObj?.publishedAt;
+              const parentShortId = parentObj?.shortId;
 
               // compute author's post index and total
               const authorKey = p.authorChannelId || p.shortId || p.author || p.id;
@@ -173,8 +157,11 @@ export default async function VideoPage({ params }: Props) {
               // build items for preview (keep chronological order)
               const items = group.map(id => {
                 const itNum = chronMap.get(id) || 0;
-                const snippet = (posts.find(x => x.id === id)?.text || '').replace(/\n/g, ' ').slice(0, 120);
-                return { id, num: itNum, snippet };
+                const postObj = posts.find(x => x.id === id);
+                const snippet = (postObj?.text || '').replace(/\n/g, ' ').slice(0, 200);
+                const authorNameItem = postObj?.author || '名無しさん';
+                const publishedAtItem = postObj?.publishedAt || '';
+                return { id, num: itNum, snippet, authorName: authorNameItem, publishedAt: publishedAtItem };
               }).sort((a,b) => a.num - b.num);
 
               return (
@@ -208,7 +195,7 @@ export default async function VideoPage({ params }: Props) {
                   <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed">
                     {typeof parentNum === 'number' && (
                       <>
-                        <a href={`#post-${parentNum}`} className="text-blue-600 underline">&gt;&gt;{parentNum}</a>
+                        <ReplyPreview parentNum={parentNum} snippet={parentSnippet} authorName={parentAuthor} publishedAt={parentPublishedAt} shortId={parentShortId} />
                         <br />
                       </>
                     )}
