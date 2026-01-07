@@ -1,61 +1,57 @@
 ﻿@import "tailwindcss";
 
 :root {
-  /* Common */
-}
-
-/* =========================================
-   RETRO THEME (Default)
-   ========================================= */
-[data-theme="retro"] {
-  --bg-body: #404040;
-  --bg-panel: #c0c0c0;
-  --bg-inset: #ffffff;
-  
-  --fg-primary: #000000;
-  --fg-secondary: #666666;
-  --fg-link: #0000ee;
-  
-  --border-light: #ffffff;
-  --border-dark: #808080;
-  --border-darker: #000000;
-  
-  --title-bg: linear-gradient(90deg, #000080, #1084d0);
-  --title-fg: #ffffff;
-  
-  --accent-active: #000080;
-  --accent-active-fg: #ffffff;
-
-  --font-body: "MS UI Gothic", "Meiryo", "Yu Gothic UI", sans-serif;
-  --radius-base: 0px;
-  --shadow-window: 1px 1px 0 1px var(--border-darker) inset, 2px 2px 0 0px var(--border-darker);
-}
-
-/* =========================================
-   MODERN THEME
-   ========================================= */
-[data-theme="modern"] {
-  --bg-body: #f3f4f6; /* gray-100 */
+  /* Default (modern-only) variables */
+  --bg-body: #f8fafc; /* very light */
   --bg-panel: #ffffff;
-  --bg-inset: #f9fafb; /* gray-50 */
+  --bg-inset: #f8fafc;
   
-  --fg-primary: #1f2937; /* gray-800 */
-  --fg-secondary: #6b7280; /* gray-500 */
-  --fg-link: #2563eb; /* blue-600 */
+  --fg-primary: #0f172a; /* strong readable */
+  --fg-secondary: #64748b;
+  --fg-link: #6366f1; /* indigo accent */
   
-  --border-light: #e5e7eb; /* gray-200 */
-  --border-dark: #d1d5db; /* gray-300 */
-  --border-darker: #9ca3af; /* gray-400 */
+  --border-light: #eef2ff; /* soft */
+  --border-dark: #e6edf8;
+  --border-darker: #cbd5e1;
   
   --title-bg: transparent;
-  --title-fg: #111827; /* gray-900 */
+  --title-fg: #0f172a;
   
-  --accent-active: #3b82f6; /* blue-500 */
+  --accent-active: #6366f1; /* indigo */
   --accent-active-fg: #ffffff;
 
-  --font-body: ui-sans-serif, system-ui, sans-serif;
-  --radius-base: 0.5rem;
-  --shadow-window: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --radius-base: 0.75rem;
+  --shadow-window: 0 10px 25px rgba(16,24,40,0.06), 0 4px 10px rgba(16,24,40,0.04);
+}
+
+/* Retro theme removed — modern-only theme now. */
+
+/* =========================================
+   MODERN THEME (Now-ish)
+   ========================================= */
+[data-theme="modern"] {
+  --bg-body: #f8fafc; /* very light */
+  --bg-panel: #ffffff;
+  --bg-inset: #f8fafc; /* subtle inset */
+  
+  --fg-primary: #0f172a; /* strong readable */
+  --fg-secondary: #64748b;
+  --fg-link: #6366f1; /* indigo accent */
+  
+  --border-light: #eef2ff; /* soft */
+  --border-dark: #e6edf8;
+  --border-darker: #cbd5e1;
+  
+  --title-bg: transparent;
+  --title-fg: #0f172a;
+  
+  --accent-active: #6366f1; /* indigo */
+  --accent-active-fg: #ffffff;
+
+  --font-body: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --radius-base: 0.75rem;
+  --shadow-window: 0 10px 25px rgba(16,24,40,0.06), 0 4px 10px rgba(16,24,40,0.04);
 }
 
 /* Base Styles */
@@ -69,11 +65,11 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-/* Only apply retro pattern in retro mode */
+/* Only apply retro pattern in retro mode (subtle) */
 [data-theme="retro"] body {
-  background-image: radial-gradient(#c0c0c0 15%, transparent 16%), radial-gradient(#c0c0c0 15%, transparent 16%);
-  background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
+  background-image: radial-gradient(rgba(192,192,192,0.06) 15%, transparent 16%), radial-gradient(rgba(192,192,192,0.06) 15%, transparent 16%);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
 }
 
 a {
@@ -131,6 +127,20 @@ a:hover {
   align-items: center;
   border-top-left-radius: var(--radius-base);
   border-top-right-radius: var(--radius-base);
+}
+
+/* Theme-specific title tweaks */
+[data-theme="retro"] .win-title-bar {
+  background: var(--title-bg);
+  color: var(--title-fg);
+  font-size: 13px;
+}
+[data-theme="modern"] .win-title-bar {
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248,250,252,0.95));
+  color: var(--title-fg);
+  border-bottom: 1px solid var(--border-light);
+  font-size: 15px;
+  padding: 10px 12px;
 }
 
 /* Inset Container (e.g. content areas) */
