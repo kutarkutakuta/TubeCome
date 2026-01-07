@@ -2,6 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
 import { LikeOutlined, DislikeOutlined } from '@ant-design/icons';
+import AuthorPostsPreview from '@/components/AuthorPostsPreview';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -37,16 +38,21 @@ export default async function VideoPage({ params }: Props) {
         const authorChannelId = top.authorChannelId?.value;
         const shortId = (authorChannelId || thread.id || '').toString().slice(0, 8);
         const isDeleted = !text || /removed|deleted|削除|This comment has been removed/i.test(text);
-        posts.push({ id: thread.id as string, author: top.authorDisplayName || '名無しさん', authorChannelId, text: text, publishedAt: top.publishedAt || '', likeCount: typeof top.likeCount === 'number' ? top.likeCount : undefined, shortId, isDeleted });
+        const topObj: any = { id: thread.id as string, author: top.authorDisplayName || '名無しさん', text: text, publishedAt: top.publishedAt || '', likeCount: typeof top.likeCount === 'number' ? top.likeCount : undefined, shortId, isDeleted };
+        if (authorChannelId != null) topObj.authorChannelId = authorChannelId;
+        posts.push(topObj as typeof posts[0]);
       }
       const replies = thread.replies?.comments || [];
       for (const r of replies) {
         const rs = r.snippet;
         const text = rs?.textDisplay ?? '';
         const authorChannelId = rs?.authorChannelId?.value;
-        const shortId = (authorChannelId || r.id || '').toString().slice(0, 8);
+        const authorChannelIdSafe = (authorChannelId == null ? undefined : authorChannelId) as string | undefined;
+        const shortId = (authorChannelIdSafe || r.id || '').toString().slice(0, 8);
         const isDeleted = !text || /removed|deleted|削除|This comment has been removed/i.test(text);
-        posts.push({ id: r.id as string, author: rs?.authorDisplayName || '名無しさん', authorChannelId, parentId: thread.id, text: text, publishedAt: rs?.publishedAt || '', likeCount: typeof rs?.likeCount === 'number' ? rs?.likeCount : undefined, isReply: true, shortId, isDeleted });
+        const replyObj: any = { id: r.id as string, author: rs?.authorDisplayName || '名無しさん', parentId: thread.id, text: text, publishedAt: rs?.publishedAt || '', likeCount: typeof rs?.likeCount === 'number' ? rs?.likeCount : undefined, isReply: true, shortId, isDeleted };
+        if (authorChannelIdSafe != null) replyObj.authorChannelId = authorChannelIdSafe;
+        posts.push(replyObj as typeof posts[0]);
       }
     }
 
@@ -136,6 +142,15 @@ export default async function VideoPage({ params }: Props) {
             const chrono = [...posts].sort((a, b) => (new Date(a.publishedAt).getTime() || 0) - (new Date(b.publishedAt).getTime() || 0));
             const chronMap = new Map(chrono.map((p, i) => [p.id, i + 1]));
 
+            // Build per-author chronological lists (for this video)
+            const authorGroups = new Map<string, string[]>();
+            for (const p of chrono) {
+              const key = p.authorChannelId || p.shortId || p.author || p.id;
+              const arr = authorGroups.get(key) || [];
+              arr.push(p.id);
+              authorGroups.set(key, arr);
+            }
+
             return display.map((p) => {
               const num = chronMap.get(p.id) || 0;
 
@@ -148,6 +163,19 @@ export default async function VideoPage({ params }: Props) {
               }
 
               const parentNum = p.parentId ? chronMap.get(p.parentId) : undefined;
+
+              // compute author's post index and total
+              const authorKey = p.authorChannelId || p.shortId || p.author || p.id;
+              const group = authorGroups.get(authorKey) || [];
+              const authorIndex = group.indexOf(p.id) + 1;
+              const authorTotal = group.length;
+
+              // build items for preview (keep chronological order)
+              const items = group.map(id => {
+                const itNum = chronMap.get(id) || 0;
+                const snippet = (posts.find(x => x.id === id)?.text || '').replace(/\n/g, ' ').slice(0, 120);
+                return { id, num: itNum, snippet };
+              }).sort((a,b) => a.num - b.num);
 
               return (
                 <div key={p.id} id={`post-${num}`} className="mb-6 break-words font-mono">
@@ -162,6 +190,9 @@ export default async function VideoPage({ params }: Props) {
                       {p.author ? <span className="ml-1">{p.author}</span> : null}
                     </span>
                     {' '} : {formatDate(p.publishedAt)} ID:{p.shortId}
+                    {authorTotal > 1 ? (
+                      <AuthorPostsPreview items={items} authorIndex={authorIndex} authorTotal={authorTotal} />
+                    ) : null}
                   <span className="ml-2 vote-badges">
                     {typeof p.likeCount === 'number' && p.likeCount > 0 ? (
                       <span className="vote-badge like"><LikeOutlined className="anticon" /><span className="vote-count">{p.likeCount.toLocaleString()}</span></span>
