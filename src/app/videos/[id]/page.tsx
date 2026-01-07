@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
+import { LikeOutlined, DislikeOutlined } from '@ant-design/icons';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -131,10 +132,12 @@ export default async function VideoPage({ params }: Props) {
               for (const r of replies) display.push(r);
             }
 
-            const idToIndex = new Map(display.map((p, i) => [p.id, i + 1]));
+            // Build chronological mapping (oldest-first)
+            const chrono = [...posts].sort((a, b) => (new Date(a.publishedAt).getTime() || 0) - (new Date(b.publishedAt).getTime() || 0));
+            const chronMap = new Map(chrono.map((p, i) => [p.id, i + 1]));
 
-            return display.map((p, idx) => {
-              const num = idx + 1;
+            return display.map((p) => {
+              const num = chronMap.get(p.id) || 0;
 
               if (p.isDeleted) {
                 return (
@@ -144,7 +147,7 @@ export default async function VideoPage({ params }: Props) {
                 );
               }
 
-              const parentNum = p.parentId ? idToIndex.get(p.parentId) : undefined;
+              const parentNum = p.parentId ? chronMap.get(p.parentId) : undefined;
 
               return (
                 <div key={p.id} id={`post-${num}`} className="mb-6 break-words font-mono">
@@ -159,7 +162,14 @@ export default async function VideoPage({ params }: Props) {
                       {p.author ? <span className="ml-1">{p.author}</span> : null}
                     </span>
                     {' '} : {formatDate(p.publishedAt)} ID:{p.shortId}
-                  <span className="ml-2 text-xs text-[var(--fg-secondary)]">（いいね: {typeof p.likeCount === 'number' ? p.likeCount.toLocaleString() : '—'}{typeof p.dislikeCount === 'number' && p.dislikeCount > 0 ? <> / 低評価: {p.dislikeCount.toLocaleString()}</> : null}）</span>
+                  <span className="ml-2 vote-badges">
+                    {typeof p.likeCount === 'number' && p.likeCount > 0 ? (
+                      <span className="vote-badge like"><LikeOutlined className="anticon" /><span className="vote-count">{p.likeCount.toLocaleString()}</span></span>
+                    ) : null}
+                    {typeof p.dislikeCount === 'number' && p.dislikeCount > 0 ? (
+                      <span className="vote-badge dislike"><DislikeOutlined className="anticon" /><span className="vote-count">{p.dislikeCount.toLocaleString()}</span></span>
+                    ) : null}
+                  </span>
                   </div>
                   <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed">
                     {typeof parentNum === 'number' && (
