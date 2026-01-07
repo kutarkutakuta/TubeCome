@@ -21,14 +21,15 @@ export default function AddChannelForm() {
         return;
       }
       const channelId = json.channelId;
+      const channelTitle = json.channelTitle || channelId;
       if (!channelId) {
         setStatus('error');
         setMessage('channel_not_found');
         return;
       }
-      await idbAddFavorite(channelId, channelId);
+      await idbAddFavorite(channelId, channelTitle);
       setStatus('ok');
-      setMessage('added');
+      setMessage(`登録しました: ${channelTitle}`);
       setInput('');
       window.dispatchEvent(new CustomEvent('favorites-changed'));
     } catch (err) {

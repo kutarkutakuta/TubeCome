@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/utils/supabase/client';
 
+import { randomUUID } from 'crypto';
+
 function getClientIdFromReq(req: Request) {
   const cookie = req.headers.get('cookie') || '';
   const match = cookie.match(/(?:^|; )tubecome_client_id=([^;]+)/);
@@ -19,8 +21,8 @@ function makeCookieResponse(data: any, clientId?: string) {
 async function ensureClientId(req: Request) {
   let clientId = getClientIdFromReq(req);
   if (!clientId) {
-    // use crypto.randomUUID if available
-    clientId = (globalThis as any).crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2,9)}`;
+    // use Node's crypto.randomUUID for server safety
+    clientId = randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2,9)}`;
   }
   return clientId;
 }

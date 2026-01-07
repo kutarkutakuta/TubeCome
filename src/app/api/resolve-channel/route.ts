@@ -19,11 +19,36 @@ export async function POST(req: Request) {
 
   // If it's already a channel id
   const idMatch = input.match(/^(UC[0-9A-Za-z_-]{20,})$/);
-  if (idMatch) return NextResponse.json({ channelId: idMatch[1] });
+  if (idMatch) {
+    const ch = idMatch[1];
+    // try to fetch channel title via RSS
+    try {
+      const rss = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${ch}`);
+      if (rss.ok) {
+        const txt = await rss.text();
+        const m = txt.match(/<title>([^<]+)<\/title>/);
+        const title = m ? m[1] : null;
+        return NextResponse.json({ channelId: ch, channelTitle: title });
+      }
+    } catch (e) {}
+    return NextResponse.json({ channelId: ch });
+  }
 
   // If URL contains /channel/ID
   const fromUrl = extractChannelIdFromUrl(input);
-  if (fromUrl) return NextResponse.json({ channelId: fromUrl });
+  if (fromUrl) {
+    const ch = fromUrl;
+    try {
+      const rss = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${ch}`);
+      if (rss.ok) {
+        const txt = await rss.text();
+        const m = txt.match(/<title>([^<]+)<\/title>/);
+        const title = m ? m[1] : null;
+        return NextResponse.json({ channelId: ch, channelTitle: title });
+      }
+    } catch (e) {}
+    return NextResponse.json({ channelId: ch });
+  }
 
   // If it's a Youtube URL, try fetch and extract channelId from HTML
   let targetUrl = input;

@@ -81,3 +81,72 @@ export async function getCommentThreads({ videoId, maxResults = 20, pageToken }:
     throw error;
   }
 }
+
+// --- Video statistics helper with simple in-memory cache ---
+
+type VideoStats = {
+  viewCount?: number;
+  likeCount?: number;
+  commentCount?: number;
+};
+
+const statsCache = new Map<string, { data: VideoStats | null; expiresAt: number }>();
+const STATS_TTL = 1000 * 60 * 10; // 10 minutes
+
+export async function getVideoStatistics(ids: string[]): Promise<Record<string, VideoStats | null>> {
+  const now = Date.now();
+  const result: Record<string, VideoStats | null> = {};
+  const toFetch: string[] = [];
+
+  for (const id of ids) {
+    const cached = statsCache.get(id);
+    if (cached && cached.expiresAt > now) {
+      result[id] = cached.data;
+    } else {
+      toFetch.push(id);
+    }
+  }
+
+  if (toFetch.length > 0) {
+    try {
+      const response = await youtube.videos.list({
+        part: ['statistics'],
+        id: toFetch,
+        maxResults: 50,
+      });
+
+      const items = response.data.items || [];
+      // fill fetched data
+      const fetchedMap: Record<string, VideoStats | null> = {};
+      for (const item of items) {
+        const stats = item.statistics;
+        fetchedMap[item.id as string] = {
+          viewCount: stats?.viewCount ? parseInt(stats.viewCount, 10) : undefined,
+          likeCount: stats?.likeCount ? parseInt(stats.likeCount, 10) : undefined,
+          commentCount: stats?.commentCount ? parseInt(stats.commentCount, 10) : undefined,
+        };
+      }
+
+      // For ids not present in items, set null
+      for (const id of toFetch) {
+        const data = fetchedMap[id] ?? null;
+        statsCache.set(id, { data, expiresAt: Date.now() + STATS_TTL });
+        result[id] = data;
+      }
+    } catch (err) {
+      console.error('Error fetching video statistics:', err);
+      // On error, set null for requested ids and don't overwrite existing cache
+      for (const id of toFetch) {
+        const cached = statsCache.get(id);
+        if (cached && cached.expiresAt > now) {
+          result[id] = cached.data;
+        } else {
+          statsCache.set(id, { data: null, expiresAt: Date.now() + 1000 * 60 }); // short negative cache
+          result[id] = null;
+        }
+      }
+    }
+  }
+
+  return result;
+}

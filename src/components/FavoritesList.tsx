@@ -22,7 +22,30 @@ export default function FavoritesList() {
 
   useEffect(() => {
     let mounted = true;
-    fetchFavorites().then(data => { if (mounted) setFavorites(data); });
+    async function load() {
+      const data = await fetchFavorites();
+      // Resolve missing titles for UC ids
+      const toResolve = data.filter((d:any) => (!d.title || d.title === d.id) && /^UC[0-9A-Za-z_-]{20,}$/.test(d.id));
+      for (const item of toResolve) {
+        try {
+          const res = await fetch('/api/resolve-channel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ input: item.id }) });
+          if (res.ok) {
+            const json = await res.json();
+            const title = json.channelTitle;
+            if (title) {
+              // update IndexedDB
+              await import('@/utils/indexeddb').then(m => m.addFavorite(item.id, title));
+            }
+          }
+        } catch (e) {
+          // ignore resolution errors
+        }
+      }
+      const refreshed = await fetchFavorites();
+      if (mounted) setFavorites(refreshed);
+    }
+    load();
+
     function onChange() {
       fetchFavorites().then(data => setFavorites(data));
     }
@@ -46,7 +69,7 @@ export default function FavoritesList() {
         <ul className="space-y-2">
           {favorites.map((ch) => (
             <li key={ch.id} className="flex items-center justify-between">
-              <Link href={`/search?channel=${encodeURIComponent(ch.id)}`} className="text-[var(--fg-primary)]">
+              <Link href={`/channel/${encodeURIComponent(ch.id)}`} className="text-[var(--fg-primary)]">
                 {ch.title || ch.id}
               </Link>
               <button
