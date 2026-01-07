@@ -2,6 +2,8 @@
 import './globals.css';
 import Link from 'next/link';
 import FavoritesList from '../components/FavoritesList';
+import AddChannelForm from '../components/AddChannelForm';
+import MobileActions from '../components/MobileActions';
 
 export const metadata: Metadata = {
   title: 'TubeCome | Retro Edition',
@@ -13,10 +15,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Mobile-app style menu (閲覧履歴、人気動画、検索、設定)
+  // Menu order: チャンネル登録, お気に入りチャンネル, 履歴, 検索, 設定
   const menuItems = [
     { name: '閲覧履歴', href: '/history', icon: '🕘' },
-    { name: '人気動画', href: '/popular', icon: '🔥' },
     { name: '検索', href: '/search', icon: '🔍' },
     { name: '設定', href: '/settings', icon: '⚙️' },
   ];
@@ -36,10 +37,18 @@ export default function RootLayout({
                     </h1>
                 </div>
             </div>
+            
+            {/* Favorites List */}
+            <div className='p-2'>
+              <div className='mt-2'>
+                  {/* Add channel form */}
+                  <div className='mb-2'><AddChannelForm /></div>
+                  <FavoritesList />
+                </div>
+            </div>
 
             <div className='flex-1 overflow-y-auto p-2'>
                 <div className='win-outset bg-[var(--bg-panel)] p-1'>
-                    <div className='win-title-bar mb-1'>MAIN MENU</div>
                     <ul className='space-y-1'>
                     {menuItems.map((item) => (
                         <li key={item.name}>
@@ -56,21 +65,7 @@ export default function RootLayout({
                 </div>
 
             </div>
-            
-            {/* Start Button Area (Decorative) */}
-            <div className='p-2 border-t border-white shadow-[0_-1px_0_0_#808080] bg-[var(--bg-panel)]'>
-                <button className='flex items-center space-x-1 win-btn font-bold w-full justify-start'>
-                    <span className='italic font-serif bg-gradient-to-r from-red-500 to-orange-500 text-transparent bg-clip-text'>Start</span>
-                    <span className='text-xs ml-auto'>23:00</span>
-                </button>
-            </div>
-
-            {/* Favorites List */}
-            <div className='p-2'>
-              <div className='mt-2'>
-                <FavoritesList />
-              </div>
-            </div>
+          
           </aside>
 
           {/* Main Content Area */}
@@ -79,8 +74,9 @@ export default function RootLayout({
           </main>
 
           {/* Bottom Navigation (Mobile Only) */}
-          <nav className='md:hidden fixed bottom-0 left-0 w-full h-16 mobile-nav-container grid grid-cols-5 z-50 px-1 pb-1'>
-            {menuItems.map((item) => (
+          <nav className='md:hidden fixed bottom-0 left-0 w-full h-16 mobile-nav-container grid grid-cols-4 z-50 px-1 pb-1'>
+            {/* On mobile, チャンネル登録 and お気に入り are accessed via action buttons (floating). */}
+            {menuItems.slice(2).map((item) => (
               <Link 
                 key={item.name} 
                 href={item.href}
@@ -93,6 +89,9 @@ export default function RootLayout({
               </Link>
             ))}
           </nav>
+
+          {/* Mobile floating actions for Add/Favorites */}
+          <MobileActions />
         </div>
       </body>
     </html>

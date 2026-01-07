@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites';
+import { isFavorite } from '@/utils/indexeddb';
 
 type Video = {
   id: string;
@@ -16,17 +17,24 @@ export default function VideoCard({ v }: { v: Video }) {
   const [isFav, setIsFav] = useState(false);
 
   useEffect(() => {
-    setIsFav(getFavorites().includes(v.channel));
+    let mounted = true;
+    isFavorite(v.channel).then(f => { if (mounted) setIsFav(f); }).catch(()=>{});
+    return ()=>{ mounted = false };
   }, [v.channel]);
 
-  function toggle() {
-    if (isFav) {
-      removeFavorite(v.channel);
-    } else {
-      addFavorite(v.channel);
+  async function toggle() {
+    try {
+      if (isFav) {
+        await import('@/utils/indexeddb').then(m => m.removeFavorite(v.channel));
+      } else {
+        await import('@/utils/indexeddb').then(m => m.addFavorite(v.channel, v.channel));
+      }
+    } catch (e) {
+      // fallback to localStorage
+      if (isFav) removeFavorite(v.channel);
+      else addFavorite(v.channel);
     }
     setIsFav(!isFav);
-    // notify other components
     window.dispatchEvent(new CustomEvent('favorites-changed'));
   }
 
