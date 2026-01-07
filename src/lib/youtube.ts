@@ -82,6 +82,42 @@ export async function getCommentThreads({ videoId, maxResults = 20, pageToken }:
   }
 }
 
+/**
+ * 動画の詳細（snippet, contentDetails, statistics）を取得して整形して返す
+ */
+export async function getVideoDetails(id: string) {
+  try {
+    const response = await youtube.videos.list({
+      part: ['snippet', 'contentDetails', 'statistics'],
+      id: [id],
+    });
+    const item = response.data.items && response.data.items[0];
+    if (!item) return null;
+
+    const snippet = item.snippet;
+    const cd = item.contentDetails;
+    const stats = item.statistics;
+
+    return {
+      id: item.id as string,
+      title: snippet?.title || '',
+      description: snippet?.description || '',
+      thumbnail: snippet?.thumbnails?.high?.url || snippet?.thumbnails?.default?.url || '',
+      channelTitle: snippet?.channelTitle || '',
+      publishedAt: snippet?.publishedAt || '',
+      duration: cd?.duration || '',
+      statistics: {
+        viewCount: stats?.viewCount ? parseInt(stats.viewCount, 10) : undefined,
+        likeCount: stats?.likeCount ? parseInt(stats.likeCount, 10) : undefined,
+        commentCount: stats?.commentCount ? parseInt(stats.commentCount, 10) : undefined,
+      },
+    };
+  } catch (err) {
+    console.error('Error fetching video details:', err);
+    throw err;
+  }
+}
+
 // --- Video statistics helper with simple in-memory cache ---
 
 type VideoStats = {
