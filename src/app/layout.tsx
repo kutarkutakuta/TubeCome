@@ -4,7 +4,7 @@ import './globals.css';
 import Link from 'next/link';
 import FavoritesList from '../components/FavoritesList';
 import AddChannelForm from '../components/AddChannelForm';
-import MobileActions from '../components/MobileActions';
+import MobileFooterNav from '../components/MobileFooterNav';
 
 export const metadata: Metadata = {
   title: 'TubeCome | Retro Edition',
@@ -16,11 +16,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Menu order: チャンネル登録, お気に入りチャンネル, 履歴, 検索, 設定
+  // Menu items for desktop sidebar: 設定, ヘルプ
   const menuItems = [
-    { name: '閲覧履歴', href: '/history', icon: '🕘' },
-    { name: '検索', href: '/search', icon: '🔍' },
     { name: '設定', href: '/settings', icon: '⚙️' },
+    { name: 'ヘルプ', href: '/help', icon: '❓' },
   ];
 
   return (
@@ -75,25 +74,8 @@ export default function RootLayout({
               {children}
             </main>
 
-            {/* Bottom Navigation (Mobile Only) */}
-            <nav className='md:hidden fixed bottom-0 left-0 w-full h-16 mobile-nav-container grid grid-cols-4 z-50 px-1 pb-1'>
-              {/* On mobile, チャンネル登録 and お気に入り are accessed via action buttons (floating). */}
-              {menuItems.slice(2).map((item) => (
-                <Link 
-                  key={item.name} 
-                  href={item.href}
-                  className='flex flex-col items-center justify-center active:bg-gray-300 rounded-sm m-0.5'
-                >
-                  <div className='win-btn p-1 flex flex-col items-center w-full h-full justify-center'>
-                      <span className='text-lg leading-none mb-0.5'>{item.icon}</span>
-                      <span className='text-[10px] font-bold'>{item.name}</span>
-                  </div>
-                </Link>
-              ))}
-            </nav>
-
-            {/* Mobile floating actions for Add/Favorites */}
-            <MobileActions />
+            {/* Mobile Footer Navigation (Mobile Only) */}
+            <MobileFooterNav />
           </div>
         </AntdRegistry>
       </body>
