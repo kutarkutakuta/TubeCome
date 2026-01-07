@@ -27,7 +27,7 @@ export default async function VideoPage({ params }: Props) {
     const commentsResp = await getCommentThreads({ videoId: id, maxResults: 100 });
 
     // normalize threads into flat array: root then replies
-    const posts: Array<{ id: string; author: string; authorChannelId?: string; parentId?: string; text: string; publishedAt: string; likeCount?: number; isReply?: boolean; shortId?: string; isDeleted?: boolean }> = [];
+    const posts: Array<{ id: string; author: string; authorChannelId?: string; parentId?: string; text: string; publishedAt: string; likeCount?: number; dislikeCount?: number; isReply?: boolean; shortId?: string; isDeleted?: boolean }> = [];
 
     for (const thread of commentsResp.items || []) {
       const top = thread.snippet?.topLevelComment?.snippet;
@@ -159,6 +159,7 @@ export default async function VideoPage({ params }: Props) {
                       {p.author ? <span className="ml-1">{p.author}</span> : null}
                     </span>
                     {' '} : {formatDate(p.publishedAt)} ID:{p.shortId}
+                  <span className="ml-2 text-xs text-[var(--fg-secondary)]">（いいね: {typeof p.likeCount === 'number' ? p.likeCount.toLocaleString() : '—'}{typeof p.dislikeCount === 'number' && p.dislikeCount > 0 ? <> / 低評価: {p.dislikeCount.toLocaleString()}</> : null}）</span>
                   </div>
                   <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed">
                     {typeof parentNum === 'number' && (
@@ -169,7 +170,6 @@ export default async function VideoPage({ params }: Props) {
                     )}
                     {renderCommentText(p.text)}
                   </div>
-                  {typeof p.likeCount === 'number' && p.likeCount > 0 && <div className="ml-4 mt-1 text-xs text-[var(--fg-secondary)]">（いいね: {p.likeCount}）</div>}
                 </div>
               );
             });
