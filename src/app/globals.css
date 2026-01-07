@@ -1,26 +1,224 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Common */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* =========================================
+   RETRO THEME (Default)
+   ========================================= */
+[data-theme="retro"] {
+  --bg-body: #404040;
+  --bg-panel: #c0c0c0;
+  --bg-inset: #ffffff;
+  
+  --fg-primary: #000000;
+  --fg-secondary: #666666;
+  --fg-link: #0000ee;
+  
+  --border-light: #ffffff;
+  --border-dark: #808080;
+  --border-darker: #000000;
+  
+  --title-bg: linear-gradient(90deg, #000080, #1084d0);
+  --title-fg: #ffffff;
+  
+  --accent-active: #000080;
+  --accent-active-fg: #ffffff;
+
+  --font-body: "MS UI Gothic", "Meiryo", "Yu Gothic UI", sans-serif;
+  --radius-base: 0px;
+  --shadow-window: 1px 1px 0 1px var(--border-darker) inset, 2px 2px 0 0px var(--border-darker);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* =========================================
+   MODERN THEME
+   ========================================= */
+[data-theme="modern"] {
+  --bg-body: #f3f4f6; /* gray-100 */
+  --bg-panel: #ffffff;
+  --bg-inset: #f9fafb; /* gray-50 */
+  
+  --fg-primary: #1f2937; /* gray-800 */
+  --fg-secondary: #6b7280; /* gray-500 */
+  --fg-link: #2563eb; /* blue-600 */
+  
+  --border-light: #e5e7eb; /* gray-200 */
+  --border-dark: #d1d5db; /* gray-300 */
+  --border-darker: #9ca3af; /* gray-400 */
+  
+  --title-bg: transparent;
+  --title-fg: #111827; /* gray-900 */
+  
+  --accent-active: #3b82f6; /* blue-500 */
+  --accent-active-fg: #ffffff;
+
+  --font-body: ui-sans-serif, system-ui, sans-serif;
+  --radius-base: 0.5rem;
+  --shadow-window: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
+/* Base Styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-body);
+  color: var(--fg-primary);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  transition: background-color 0.3s, color 0.3s;
 }
+
+/* Only apply retro pattern in retro mode */
+[data-theme="retro"] body {
+  background-image: radial-gradient(#c0c0c0 15%, transparent 16%), radial-gradient(#c0c0c0 15%, transparent 16%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
+
+a {
+  color: var(--fg-link);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar (Retro only for now, or adapted custom) */
+::-webkit-scrollbar {
+  width: 16px;
+  background: var(--bg-panel);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-right-color: var(--border-darker);
+  border-bottom-color: var(--border-darker);
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-panel);
+}
+
+/* =========================================
+   Component Classes (Abstractions)
+   ========================================= */
+
+.win-window {
+  background-color: var(--bg-panel);
+  position: relative;
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-window);
+}
+
+/* Retro specific borders */
+[data-theme="retro"] .win-window {
+  border: 1px solid var(--border-light);
+  border-right-color: var(--border-darker);
+  border-bottom-color: var(--border-darker);
+}
+[data-theme="modern"] .win-window {
+  border: 1px solid var(--border-light);
+}
+
+.win-title-bar {
+  background: var(--title-bg);
+  color: var(--title-fg);
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: var(--radius-base);
+  border-top-right-radius: var(--radius-base);
+}
+
+/* Inset Container (e.g. content areas) */
+.win-inset {
+  background-color: var(--bg-inset);
+  border-radius: calc(var(--radius-base) / 2);
+}
+[data-theme="retro"] .win-inset {
+  border: 2px solid var(--border-dark);
+  border-right-color: var(--border-light);
+  border-bottom-color: var(--border-light);
+  box-shadow: inset 1px 1px 0px var(--border-darker), inset -1px -1px 0px var(--bg-panel);
+}
+[data-theme="modern"] .win-inset {
+  border: 1px solid var(--border-light);
+}
+
+/* Outset Container (e.g. buttons, bars) */
+.win-outset {
+  background-color: var(--bg-panel);
+  border-radius: calc(var(--radius-base) / 2);
+}
+[data-theme="retro"] .win-outset {
+  border: 2px solid var(--border-light);
+  border-right-color: var(--border-dark);
+  border-bottom-color: var(--border-dark);
+  box-shadow: 1px 1px 0px var(--border-darker);
+}
+
+/* Buttons */
+.win-btn {
+  background-color: var(--bg-panel);
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: calc(var(--radius-base) / 2);
+  transition: all 0.1s;
+}
+
+[data-theme="retro"] .win-btn {
+  border: 1px solid var(--border-light);
+  border-right-color: var(--border-darker);
+  border-bottom-color: var(--border-darker);
+  box-shadow: inset 1px 1px 0px var(--border-light), inset -1px -1px 0px var(--border-dark);
+}
+[data-theme="retro"] .win-btn:active {
+  border: 1px solid var(--border-darker);
+  border-right-color: var(--border-light);
+  border-bottom-color: var(--border-light);
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+[data-theme="modern"] .win-btn {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-dark);
+  color: var(--fg-primary);
+}
+[data-theme="modern"] .win-btn:hover {
+  background-color: var(--bg-inset);
+}
+[data-theme="modern"] .win-btn:active {
+  background-color: var(--border-light);
+}
+
+/* Layout Specifics */
+.sidebar-container {
+  background-color: var(--bg-panel);
+  border-right: 1px solid var(--border-dark);
+}
+[data-theme="retro"] .sidebar-container {
+  border-right: 2px solid var(--border-light);
+  box-shadow: 2px 0 0 -1px var(--border-dark), 3px 0 0 -1px var(--border-darker);
+}
+
+.mobile-nav-container {
+  background-color: var(--bg-panel);
+  border-top: 1px solid var(--border-dark);
+}
+[data-theme="retro"] .mobile-nav-container {
+  border-top: 2px solid var(--border-light);
+  box-shadow: 0 -2px 0 -1px var(--border-dark);
+}
+
+/* Helper for accent backgrounds */
+.bg-accent {
+  background-color: var(--accent-active);
+  color: var(--accent-active-fg);
+}
+
