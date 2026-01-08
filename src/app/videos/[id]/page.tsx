@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import ZoomableThumbnail from '@/components/ZoomableThumbnail';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
 import { LikeOutlined, DislikeOutlined, YoutubeOutlined } from '@ant-design/icons';
@@ -252,6 +253,12 @@ export default async function VideoPage({ params }: Props) {
           {/* prev/next links from client-side list if available */}
           <div>
             <PrevNextClient currentId={id} />
+          </div>
+
+          <div className="mt-4 text-sm flex gap-4 justify-center">
+            {details.channelId ? (
+              <Link href={`/channel/${encodeURIComponent(details.channelId)}`} className="inline-flex items-center gap-2 max-w-full sm:max-w-[45%] text-sm font-bold text-[var(--fg-primary)]">動画一覧へ戻る</Link>
+            ) : null}
           </div>
 
 
