@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import ZoomableThumbnail from '@/components/ZoomableThumbnail';
+import SaveVideoStats from '@/components/SaveVideoStats';
+import LastViewedMarker from '@/components/LastViewedMarker';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
 import { LikeOutlined, DislikeOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { linkify } from '@/utils/linkify';
@@ -104,7 +106,8 @@ export default async function VideoPage({ params }: Props) {
 
     return (
       <div className="p-4 max-w-3xl mx-auto">
-
+        <SaveVideoStats videoId={id} totalComments={posts.length} />
+        <LastViewedMarker videoId={id} />
 
         <div className="win-window p-3 mb-4">
           <div className="flex flex-row gap-4 items-start">
@@ -213,7 +216,7 @@ export default async function VideoPage({ params }: Props) {
               const isOwner = p.authorChannelId && p.authorChannelId === details.channelId;
 
               return (
-                <div key={p.id} id={`post-${num}`} className="mb-6 break-words font-mono">
+                <div key={p.id} id={`post-${num}`} data-comment-num={num} className="mb-6 break-words font-mono">
                   <div className="mb-2 text-sm text-[var(--fg-secondary)] flex flex-wrap items-center">
                     <span className="mr-2">{num} :</span>
                     

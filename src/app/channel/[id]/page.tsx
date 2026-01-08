@@ -1,7 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
+import { Badge } from 'antd';
 import ZoomableThumbnail from '@/components/ZoomableThumbnail';
 import MarkChannelVisited from '@/components/MarkChannelVisited';
+import CommentBadgeClient from '@/components/CommentBadgeClient';
+import NewVideoBadge from '@/components/NewVideoBadge';
 import { getVideoStatistics } from '@/lib/youtube';
 import PrefetchStats from '@/components/PrefetchStats';
 import CaptureVideoListClient from '@/components/CaptureVideoListClient';
@@ -102,6 +105,8 @@ export default async function ChannelPage({ params }: Props) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2">
                     <Link href={`/videos/${v.id}`} className="text-sm font-bold text-[var(--fg-primary)] line-clamp-2 break-words min-w-0 block">{decodeHtml(v.title)}</Link>
+                    <NewVideoBadge channelId={id} publishedDate={v.published} />
+                    <CommentBadgeClient videoId={v.id} currentCount={s?.commentCount} />
                     {v.durationSeconds && (
                       <div className="text-[10px] bg-[var(--bg-panel)] px-1 rounded text-[var(--fg-secondary)]">{formatDuration(v.durationSeconds)}</div>
                     )}

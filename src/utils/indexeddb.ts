@@ -1,8 +1,9 @@
 // Lightweight IndexedDB helper for registered channels
 const DB_NAME = 'tubecome_db';
 const STORE = 'channels';
+const VIDEO_STATS_STORE = 'videoStats';
 // Bump version to ensure migrations run when the store name changed previously
-const VERSION = 2;
+const VERSION = 3;
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -14,6 +15,11 @@ function openDB(): Promise<IDBDatabase> {
       // Ensure channels store exists
       if (!db.objectStoreNames.contains(STORE)) {
         db.createObjectStore(STORE, { keyPath: 'id' });
+      }
+
+      // Ensure videoStats store exists
+      if (!db.objectStoreNames.contains(VIDEO_STATS_STORE)) {
+        db.createObjectStore(VIDEO_STATS_STORE, { keyPath: 'videoId' });
       }
 
       // If an older 'favorites' store exists, migrate its data into 'channels'
@@ -182,5 +188,106 @@ export async function resetAllLastVisitedForTest() {
       resolve();
     };
     tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Save video comment count when viewing a video
+export async function saveVideoCommentCount(videoId: string, commentCount: number) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readwrite');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const payload = { videoId, commentCount, lastViewed: Date.now() };
+    const req = store.put(payload);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Save the maximum viewed comment number (based on scroll position)
+export async function saveViewedCommentNumber(videoId: string, maxViewedNumber: number) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readwrite');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const getReq = store.get(videoId);
+    getReq.onsuccess = () => {
+      const existing = getReq.result || { videoId };
+      existing.maxViewedCommentNumber = maxViewedNumber;
+      existing.lastViewed = Date.now();
+      store.put(existing);
+    };
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Get previous comment count for a video
+export async function getPreviousCommentCount(videoId: string): Promise<number | null> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains(VIDEO_STATS_STORE)) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readonly');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const req = store.get(videoId);
+    req.onsuccess = () => {
+      const result = req.result;
+      resolve(result ? result.commentCount : null);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Get the maximum viewed comment number for a video
+export async function getMaxViewedCommentNumber(videoId: string): Promise<number | null> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains(VIDEO_STATS_STORE)) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readonly');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const req = store.get(videoId);
+    req.onsuccess = () => {
+      const result = req.result;
+      resolve(result?.maxViewedCommentNumber ?? null);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Get previous comment counts for multiple videos
+export async function getPreviousCommentCounts(videoIds: string[]): Promise<Record<string, number>> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains(VIDEO_STATS_STORE)) return {};
+  
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readonly');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const result: Record<string, number> = {};
+    
+    let pending = videoIds.length;
+    if (pending === 0) {
+      resolve(result);
+      return;
+    }
+    
+    for (const videoId of videoIds) {
+      const req = store.get(videoId);
+      req.onsuccess = () => {
+        const data = req.result;
+        if (data && typeof data.maxViewedCommentNumber === 'number') {
+          result[videoId] = data.maxViewedCommentNumber;
+        }
+        pending--;
+        if (pending === 0) {
+          resolve(result);
+        }
+      };
+      req.onerror = () => {
+        pending--;
+        if (pending === 0) {
+          resolve(result);
+        }
+      };
+    }
   });
 }
