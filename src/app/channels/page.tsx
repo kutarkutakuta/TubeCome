@@ -1,25 +1,29 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { List, Button, Popconfirm, message } from 'antd';
-import { StarOutlined, StarFilled, DeleteOutlined, MenuOutlined } from '@ant-design/icons';
+import { List, Button, Popconfirm, message, Badge } from 'antd';
+import { StarOutlined, StarFilled, DeleteOutlined, MenuOutlined, ReloadOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import AddChannelForm from '@/components/AddChannelForm';
-import { getAllChannels, removeChannel as idbRemoveChannel, addChannel as idbAddChannel } from '@/utils/indexeddb';
+import { getAllChannels, removeChannel as idbRemoveChannel, addChannel as idbAddChannel, resetAllLastVisitedForTest } from '@/utils/indexeddb';
 import { getFavorites, addFavorite, removeFavorite } from '@/utils/favorites';
+import { countNewVideos } from '@/utils/rss';
 
 export default function ChannelsPage() {
-  const [channels, setChannels] = useState<Array<{id:string,title?:string}>>([]);
+  const [channels, setChannels] = useState<Array<{id:string,title?:string,lastVisited?:number}>>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [newCounts, setNewCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     let mounted = true;
     async function load() {
       const ch = await getAllChannels();
-      if (mounted) setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail })));
+      if (mounted) setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail, lastVisited: c.lastVisited })));
       await resolveMissingTitles(ch);
+      // Fetch new video counts for each channel
+      fetchNewCounts(ch);
     }
     load();
     async function resolveMissingTitles(channels: Array<any>) {
@@ -51,6 +55,16 @@ export default function ChannelsPage() {
     setFavorites(getFavorites());
     return () => { mounted = false; window.removeEventListener('channels-changed', onChannels); window.removeEventListener('favorites-changed', onFavs); };
   }, []);
+
+  // Fetch new video counts in the background
+  async function fetchNewCounts(channelList: Array<any>) {
+    const counts: Record<string, number> = {};
+    for (const ch of channelList) {
+      const count = await countNewVideos(ch.id, ch.lastVisited);
+      if (count > 0) counts[ch.id] = count;
+    }
+    setNewCounts(counts);
+  }
 
   // drag handlers
   function onDragStart(e: React.DragEvent, id: string) {
@@ -99,13 +113,20 @@ export default function ChannelsPage() {
     }
 
     const ch = await getAllChannels();
-    setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail })));
+    setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail, lastVisited: c.lastVisited })));
   }
 
   function toggleFav(id: string) {
     if (favorites.includes(id)) removeFavorite(id);
     else addFavorite(id);
     setFavorites(getFavorites());
+  }
+
+  async function handleTestReset() {
+    await resetAllLastVisitedForTest();
+    message.success('全チャンネルの訪問日時を7日前にリセットしました。ページを更新してください。');
+    // Reload to fetch new counts
+    window.location.reload();
   }
 
   return (
@@ -118,7 +139,17 @@ export default function ChannelsPage() {
       </div>
 
       <div className="win-window win-title-bar mb-4">
-        <div className="text-lg font-bold">チャンネル</div>
+        <div className="flex items-center justify-between">
+          <div className="text-lg font-bold">チャンネル</div>
+          <Button 
+            size="small" 
+            icon={<ReloadOutlined />} 
+            onClick={handleTestReset}
+            type="dashed"
+          >
+            テスト: 新着リセット
+          </Button>
+        </div>
       </div>
 
       <div className="win-window win-inset p-4">
@@ -156,8 +187,11 @@ export default function ChannelsPage() {
                   onClick={() => { toggleFav(ch.id); }}
                 />
 
-                <div className="flex-1">
-                  <Link href={`/channel/${encodeURIComponent(ch.id)}`}>{ch.title || ch.id}</Link>
+                <div className="flex-1 min-w-0 flex items-center gap-2">
+                  <Link href={`/channel/${encodeURIComponent(ch.id)}`} className="truncate flex-1">{ch.title || ch.id}</Link>
+                  {newCounts[ch.id] > 0 && (
+                    <Badge count={newCounts[ch.id]} showZero={false} color="#ff85c1" />
+                  )}
                 </div>
 
                 <div className="ml-2">

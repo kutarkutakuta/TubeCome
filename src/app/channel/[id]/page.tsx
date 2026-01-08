@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import ZoomableThumbnail from '@/components/ZoomableThumbnail';
+import MarkChannelVisited from '@/components/MarkChannelVisited';
 import { getVideoStatistics } from '@/lib/youtube';
 import PrefetchStats from '@/components/PrefetchStats';
 import CaptureVideoListClient from '@/components/CaptureVideoListClient';
@@ -74,6 +75,7 @@ export default async function ChannelPage({ params }: Props) {
 
     return (
       <div className="p-4 max-w-3xl mx-auto">
+        <MarkChannelVisited channelId={id} />
         <div className="win-window win-title-bar mb-4">
         <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="text-lg font-bold">{feedTitle}</div>

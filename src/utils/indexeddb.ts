@@ -39,7 +39,7 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-export async function getAllChannels(): Promise<Array<{id:string,title?:string,createdAt:number,order?:number,thumbnail?:string}>> {
+export async function getAllChannels(): Promise<Array<{id:string,title?:string,createdAt:number,order?:number,thumbnail?:string,lastVisited?:number}>> {
   const db = await openDB();
   // If the store does not exist for any reason, return empty list instead of throwing
   if (!db.objectStoreNames.contains(STORE)) return [];
@@ -139,3 +139,48 @@ export const getAllFavorites = getAllChannels;
 export const addFavorite = addChannel;
 export const removeFavorite = removeChannel;
 export const isFavorite = isChannelRegistered;
+
+// Mark a channel as visited (update lastVisited timestamp)
+export async function markChannelVisited(id: string) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    const getReq = store.get(id);
+    getReq.onsuccess = () => {
+      const rec = getReq.result;
+      if (rec) {
+        rec.lastVisited = Date.now();
+        store.put(rec);
+      }
+    };
+    tx.oncomplete = () => {
+      window.dispatchEvent(new CustomEvent('channels-changed'));
+      resolve();
+    };
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// TEST ONLY: Reset all lastVisited timestamps to 7 days ago
+export async function resetAllLastVisitedForTest() {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    const getAllReq = store.getAll();
+    getAllReq.onsuccess = () => {
+      const records = getAllReq.result || [];
+      const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+      for (const rec of records) {
+        rec.lastVisited = sevenDaysAgo;
+        store.put(rec);
+      }
+    };
+    tx.oncomplete = () => {
+      window.dispatchEvent(new CustomEvent('channels-changed'));
+      resolve();
+    };
+    tx.onerror = () => reject(tx.error);
+  });
+}
