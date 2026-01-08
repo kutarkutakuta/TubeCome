@@ -27,10 +27,10 @@ export default function ScrollToBottomClient() {
 
   return (
     <FloatButton
-      type="primary"
+      type="default"
       icon={<DownOutlined />}
       onClick={scrollToBottom}
-      style={{ right: 24, bottom: 24, display: visible ? 'inline-flex' : 'none' }}
+      style={{ right: 48, bottom: 104, display: visible ? 'inline-flex' : 'none', zIndex: 1000 }}
       tooltip="末尾へ"
     />
   );

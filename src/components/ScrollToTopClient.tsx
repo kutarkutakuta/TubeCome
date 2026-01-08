@@ -26,10 +26,10 @@ export default function ScrollToTopClient() {
 
   return (
     <FloatButton
-      type="primary"
+      type="default"
       icon={<UpOutlined />}
       onClick={scrollToTop}
-      style={{ right: 24, bottom: 88, display: visible ? 'inline-flex' : 'none', zIndex: 1000 }}
+      style={{ right: 48, bottom: 152, display: visible ? 'inline-flex' : 'none', zIndex: 1000 }}
       tooltip="トップへ"
     />
   );
