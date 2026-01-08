@@ -2,18 +2,24 @@
 
 import React from 'react';
 import { Popover } from 'antd';
+import CommentAuthor from '@/components/CommentAuthor';
 
-export default function ReplyPreview({ parentNum, snippet, authorName, publishedAt, shortId }: { parentNum?: number; snippet?: string; authorName?: string; publishedAt?: string; shortId?: string }) {
+export default function ReplyPreview({ parentNum, snippet, authorName, publishedAt, shortId, isOwner }: { parentNum?: number; snippet?: string; authorName?: string; publishedAt?: string; shortId?: string; isOwner?: boolean }) {
   if (!parentNum) return null;
 
   const formattedDate = publishedAt ? new Date(publishedAt).toLocaleString('ja-JP') : '';
 
   const content = (
     <div style={{ maxWidth: 420 }}>
-      <div className="win-inset p-2">
-        <div className="w-full flex items-center justify-between">
-          <a href={`#post-${parentNum}`} className="text-sm text-[var(--fg-primary)] font-mono">{parentNum} : {authorName || '名無しさん'}</a>
-          <div className="text-xs text-[var(--fg-secondary)]">{formattedDate}</div>
+      <div style={{ padding: '6px 8px' }}>
+        <div className="w-full">
+          <div className="mb-1 text-sm text-[var(--fg-secondary)] flex flex-wrap items-center">
+            <a href={`#post-${parentNum}`} className="font-mono mr-1">{parentNum}</a> :
+             <div className="ml-1 mr-1">
+               <CommentAuthor authorName={authorName || '名無しさん'} isOwner={isOwner} shortId={shortId} />
+             </div>
+             : {formattedDate}
+          </div>
         </div>
         <div className="w-full text-xs text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{snippet || '（親コメントがありません）'}</div>
       </div>

@@ -3,29 +3,35 @@
 import React from 'react';
 import { Popover, List } from 'antd';
 import ReplyPreview from './ReplyPreview';
+import CommentAuthor from '@/components/CommentAuthor';
 
-type Item = { id: string; num: number; snippet?: string; authorName?: string; publishedAt?: string; parentNum?: number; parentSnippet?: string; parentAuthor?: string; parentPublishedAt?: string };
+type Item = { id: string; num: number; snippet?: string; authorName?: string; publishedAt?: string; shortId?: string; isOwner?: boolean; parentNum?: number; parentSnippet?: string; parentAuthor?: string; parentPublishedAt?: string; parentIsOwner?: boolean; parentShortId?: string };
 
-export default function AuthorPostsPreview({ items, authorIndex, authorTotal, authorName }: { items: Item[]; authorIndex: number; authorTotal: number; authorName: string }) {
+export default function AuthorPostsPreview({ items, authorIndex, authorTotal, authorName, isOwner, shortId }: { items: Item[]; authorIndex: number; authorTotal: number; authorName: string; isOwner?: boolean; shortId?: string }) {
   if (!items || items.length === 0) return null;
 
   const content = (
-    <div style={{ maxWidth: 420 }}>
+    <div style={{ maxWidth: 420, maxHeight: 320, overflowY: 'auto' }}>
       <List
         size="small"
         dataSource={items}
-        renderItem={(it: Item) => (
+        renderItem={(it: Item, index: number) => (
           <List.Item style={{ padding: '6px 8px', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <div className="w-full flex items-center justify-between">
-              <div className="flex items-center">
-                <a href={`#post-${it.num}`} className="text-sm text-[var(--fg-primary)] font-mono">{it.num}</a>
-                <span className="ml-2 text-sm text-[var(--fg-primary)]">{it.authorName}</span>
+            <div className="w-full">
+              <div className="mb-1 text-sm text-[var(--fg-secondary)] flex flex-wrap items-center">
+                <a href={`#post-${it.num}`} className="font-mono mr-1">{it.num}</a> :
+                <div className="ml-1 mr-1">
+                  {/* <CommentAuthor authorName={it.authorName || '名無しさん'} isOwner={it.isOwner} shortId={it.shortId}>
+                     {it.authorName}
+                     <span className="ml-1 text-xs text-[var(--fg-secondary)] font-normal">({index + 1}/{items.length})</span>
+                  </CommentAuthor> */}
+                </div>
+                {it.publishedAt ? new Date(it.publishedAt).toLocaleString('ja-JP') : ''}
               </div>
-              <div className="text-xs text-[var(--fg-secondary)]">{it.publishedAt ? new Date(it.publishedAt).toLocaleString('ja-JP') : ''}</div>
             </div>
             {typeof it.parentNum === 'number' ? (
               <div className="mt-1">
-                <ReplyPreview parentNum={it.parentNum} snippet={it.parentSnippet} authorName={it.parentAuthor} publishedAt={it.parentPublishedAt} />
+                <ReplyPreview parentNum={it.parentNum} snippet={it.parentSnippet} authorName={it.parentAuthor} publishedAt={it.parentPublishedAt} isOwner={it.parentIsOwner} shortId={it.parentShortId} />
               </div>
             ) : null}
             <div className="w-full text-xs text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{it.snippet}</div>
@@ -37,7 +43,7 @@ export default function AuthorPostsPreview({ items, authorIndex, authorTotal, au
 
   return (
     <Popover content={content} title={`${authorName} の投稿 (${authorIndex}/${authorTotal})`} trigger={['hover', 'click']} placement="right">
-      <a className="ml-1 text-sm text-[var(--fg-primary)] cursor-pointer">
+      <a className="ml-1 text-sm text-[var(--fg-primary)] cursor-pointer inline-flex items-center">
         {authorName}
         {authorTotal > 1 ? <span className="ml-1 text-xs text-[var(--fg-secondary)]">({authorIndex}/{authorTotal})</span> : null}
       </a>

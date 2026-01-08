@@ -5,6 +5,7 @@ import { LikeOutlined, DislikeOutlined, YoutubeOutlined } from '@ant-design/icon
 import { linkify } from '@/utils/linkify';
 import AuthorPostsPreview from '@/components/AuthorPostsPreview';
 import ReplyPreview from '@/components/ReplyPreview';
+import CommentAuthor from '@/components/CommentAuthor';
 import FullDescriptionDrawer from '@/components/FullDescriptionDrawer';
 import ScrollToBottomClient from '@/components/ScrollToBottomClient';
 import ScrollToTopClient from '@/components/ScrollToTopClient';
@@ -174,6 +175,7 @@ export default async function VideoPage({ params }: Props) {
               const parentAuthor = parentObj?.author;
               const parentPublishedAt = parentObj?.publishedAt;
               const parentShortId = parentObj?.shortId;
+              const parentIsOwner = parentObj?.authorChannelId && parentObj.authorChannelId === details.channelId;
 
               // compute author's post index and total
               const authorKey = p.authorChannelId || p.shortId || p.author || p.id;
@@ -188,47 +190,52 @@ export default async function VideoPage({ params }: Props) {
                 const snippet = (postObj?.text || '').replace(/\n/g, ' ').slice(0, 200);
                 const authorNameItem = postObj?.author || '名無しさん';
                 const publishedAtItem = postObj?.publishedAt || '';
-                const parentNum = postObj?.parentId ? (chronMap.get(postObj.parentId as string) || undefined) : undefined;
-                const parentObj = postObj?.parentId ? posts.find(x => x.id === postObj.parentId) : undefined;
-                const parentSnippet = parentObj ? (parentObj.text || '').slice(0, 200) : undefined;
-                const parentAuthor = parentObj?.author;
-                const parentPublishedAt = parentObj?.publishedAt;
-                return { id, num: itNum, snippet, authorName: authorNameItem, publishedAt: publishedAtItem, parentNum, parentSnippet, parentAuthor, parentPublishedAt };
+                const pIsOwner = postObj?.authorChannelId && postObj.authorChannelId === details.channelId;
+                
+                const parentNumIt = postObj?.parentId ? (chronMap.get(postObj.parentId as string) || undefined) : undefined;
+                const parentObjIt = postObj?.parentId ? posts.find(x => x.id === postObj.parentId) : undefined;
+                const parentSnippetIt = parentObjIt ? (parentObjIt.text || '').slice(0, 200) : undefined;
+                const parentAuthorIt = parentObjIt?.author;
+                const parentPublishedAtIt = parentObjIt?.publishedAt;
+                const parentIsOwnerIt = parentObjIt?.authorChannelId && parentObjIt.authorChannelId === details.channelId;
+                
+                return { 
+                  id, num: itNum, snippet, 
+                  authorName: authorNameItem, publishedAt: publishedAtItem, 
+                  shortId: postObj?.shortId, isOwner: !!pIsOwner,
+                  parentNum: parentNumIt, parentSnippet: parentSnippetIt, 
+                  parentAuthor: parentAuthorIt, parentPublishedAt: parentPublishedAtIt,
+                  parentIsOwner: !!parentIsOwnerIt, parentShortId: parentObjIt?.shortId
+                };
               }).sort((a,b) => a.num - b.num);
+
+              const isOwner = p.authorChannelId && p.authorChannelId === details.channelId;
 
               return (
                 <div key={p.id} id={`post-${num}`} className="mb-6 break-words font-mono">
-                  <div className="mb-2 text-sm text-[var(--fg-secondary)]">
-                    {num} : 
-                    <span className="font-bold text-[var(--fg-primary)]">
-                      {p.authorChannelId && p.authorChannelId === details.channelId ? (
-                        <span className="owner-prefix">うｐ主</span>
-                      ) : (
-                        <span className="text-[var(--fg-secondary)]">名無しさん</span>
-                      )}
-                      {p.author ? (
-                        authorTotal > 1 ? (
-                          <AuthorPostsPreview items={items} authorIndex={authorIndex} authorTotal={authorTotal} authorName={p.author} />
-                        ) : (
-                          <span className="ml-1">{p.author}</span>
-                        )
+                  <div className="mb-2 text-sm text-[var(--fg-secondary)] flex flex-wrap items-center">
+                    <span className="mr-2">{num} :</span>
+                    
+                    <CommentAuthor authorName={p.author || '名無しさん'} isOwner={!!isOwner} shortId={p.shortId}>
+                      {authorTotal > 1 ? (
+                          <AuthorPostsPreview items={items} authorIndex={authorIndex} authorTotal={authorTotal} authorName={p.author} isOwner={!!isOwner} shortId={p.shortId} />
+                      ) : p.author}
+                    </CommentAuthor>
+
+                    <span className="mx-2">: {formatDate(p.publishedAt)}</span>
+                    <span className="ml-2 vote-badges">
+                      {typeof p.likeCount === 'number' && p.likeCount > 0 ? (
+                        <span className="vote-badge like"><LikeOutlined className="anticon" /><span className="vote-count">{p.likeCount.toLocaleString()}</span></span>
+                      ) : null}
+                      {typeof p.dislikeCount === 'number' && p.dislikeCount > 0 ? (
+                        <span className="vote-badge dislike"><DislikeOutlined className="anticon" /><span className="vote-count">{p.dislikeCount.toLocaleString()}</span></span>
                       ) : null}
                     </span>
-                    {' '} : {formatDate(p.publishedAt)}
-                  <span className="ml-2 vote-badges">
-                    {typeof p.likeCount === 'number' && p.likeCount > 0 ? (
-                      <span className="vote-badge like"><LikeOutlined className="anticon" /><span className="vote-count">{p.likeCount.toLocaleString()}</span></span>
-                    ) : null}
-                    {typeof p.dislikeCount === 'number' && p.dislikeCount > 0 ? (
-                      <span className="vote-badge dislike"><DislikeOutlined className="anticon" /><span className="vote-count">{p.dislikeCount.toLocaleString()}</span></span>
-                    ) : null}
-                  </span>
                   </div>
                   <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed break-words">
                     {typeof parentNum === 'number' && (
                       <>
-                        <ReplyPreview parentNum={parentNum} snippet={parentSnippet} authorName={parentAuthor} publishedAt={parentPublishedAt} shortId={parentShortId} />
-                        <br />
+                        <ReplyPreview parentNum={parentNum} snippet={parentSnippet} authorName={parentAuthor} publishedAt={parentPublishedAt} shortId={parentShortId} isOwner={!!parentIsOwner} />
                       </>
                     )}
                     {renderCommentText(p.text)}
