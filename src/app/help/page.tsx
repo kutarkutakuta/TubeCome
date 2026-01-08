@@ -4,6 +4,13 @@ import Link from 'next/link';
 export default function HelpPage() {
   return (
     <div className="p-4 max-w-3xl mx-auto">
+      <div className="win-inset bg-white p-2 mb-4">
+        <h1 className="text-2xl italic font-black text-slate-800 tracking-tighter">
+          <span className="text-blue-700">Tube</span>Come
+          <span className="text-red-500 text-xs ml-1">2000</span>
+        </h1>
+      </div>
+
       <div className="win-window win-title-bar mb-4">
         <div className="text-lg font-bold">ヘルプ</div>
       </div>

@@ -1,16 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { Drawer } from 'antd';
-import { LeftOutlined, PlusOutlined, StarOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import AddChannelForm from './AddChannelForm';
-import FavoritesList from './FavoritesList';
+import { LeftOutlined, PlusOutlined, AppstoreOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 export default function MobileFooterNav() {
-  const [showAdd, setShowAdd] = useState(false);
-  const [showFav, setShowFav] = useState(false);
-
   return (
     <>
       <nav className="md:hidden fixed bottom-0 left-0 w-full h-16 mobile-nav-container grid grid-cols-4 z-50 px-1 pb-1">
@@ -35,46 +29,27 @@ export default function MobileFooterNav() {
           </div>
         </Link>
 
-        <button
+        <Link
+          href="/channels"
           className="flex flex-col items-center justify-center active:bg-gray-300 rounded-sm m-0.5"
-          onClick={() => setShowFav(true)}
-          aria-label="お気に入り"
         >
           <div className="win-btn p-1 flex flex-col items-center w-full h-full justify-center">
-            <StarOutlined className="text-lg leading-none mb-0.5" />
-            <span className="text-[10px] font-bold">お気に入り</span>
+            <AppstoreOutlined className="text-lg leading-none mb-0.5" />
+            <span className="text-[10px] font-bold">チャンネル</span>
           </div>
-        </button>
+        </Link>
 
-        <button
+        <Link
+          href="/channels"
           className="flex flex-col items-center justify-center active:bg-gray-300 rounded-sm m-0.5"
-          onClick={() => setShowAdd(true)}
-          aria-label="チャンネル追加"
         >
           <div className="win-btn p-1 flex flex-col items-center w-full h-full justify-center">
             <PlusOutlined className="text-lg leading-none mb-0.5" />
             <span className="text-[10px] font-bold">登録</span>
           </div>
-        </button>
+        </Link>
       </nav>
 
-      <Drawer
-        title="チャンネル登録"
-        placement="bottom"
-        onClose={() => setShowAdd(false)}
-        open={showAdd}
-      >
-        <AddChannelForm />
-      </Drawer>
-
-      <Drawer
-        title="お気に入りチャンネル"
-        placement="bottom"
-        onClose={() => setShowFav(false)}
-        open={showFav}
-      >
-        <FavoritesList />
-      </Drawer>
     </>
   );
 }

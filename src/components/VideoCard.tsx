@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { Card, Button } from 'antd';
 import { StarOutlined, StarFilled, MessageOutlined } from '@ant-design/icons';
 import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites';
-import { isFavorite } from '@/utils/indexeddb';
 
 type Video = {
   id: string;
@@ -20,24 +19,17 @@ export default function VideoCard({ v }: { v: Video }) {
 
   useEffect(() => {
     let mounted = true;
-    isFavorite(v.channel).then(f => { if (mounted) setIsFav(f); }).catch(()=>{});
-    return ()=>{ mounted = false };
+    const favs = getFavorites();
+    if (mounted) setIsFav(favs.includes(v.channel));
+    function onChange() { const f = getFavorites(); if (mounted) setIsFav(f.includes(v.channel)); }
+    window.addEventListener('favorites-changed', onChange);
+    return ()=>{ mounted = false; window.removeEventListener('favorites-changed', onChange); };
   }, [v.channel]);
 
-  async function toggle() {
-    try {
-      if (isFav) {
-        await import('@/utils/indexeddb').then(m => m.removeFavorite(v.channel));
-      } else {
-        await import('@/utils/indexeddb').then(m => m.addFavorite(v.channel, v.channel));
-      }
-    } catch (e) {
-      // fallback to localStorage
-      if (isFav) removeFavorite(v.channel);
-      else addFavorite(v.channel);
-    }
+  function toggle() {
+    if (isFav) removeFavorite(v.channel);
+    else addFavorite(v.channel);
     setIsFav(!isFav);
-    window.dispatchEvent(new CustomEvent('favorites-changed'));
   }
 
   return (

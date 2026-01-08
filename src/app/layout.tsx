@@ -2,8 +2,7 @@
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import './globals.css';
 import Link from 'next/link';
-import FavoritesList from '../components/FavoritesList';
-import AddChannelForm from '../components/AddChannelForm';
+import ChannelsList from '../components/FavoritesList';
 import MobileFooterNav from '../components/MobileFooterNav';
 
 export const metadata: Metadata = {
@@ -16,9 +15,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Menu items for desktop sidebar: 設定, ヘルプ
+  // Menu items for desktop sidebar: 設定, チャンネル, ヘルプ
   const menuItems = [
-    { name: '設定', href: '/settings', icon: '⚙️' },
+    { name: 'チャンネル', href: '/channels', icon: '📺' },
+    // { name: '設定', href: '/settings', icon: '⚙️' },
     { name: 'ヘルプ', href: '/help', icon: '❓' },
   ];
 
@@ -42,9 +42,10 @@ export default function RootLayout({
               {/* Favorites List */}
               <div className='p-2'>
                 <div className='mt-2'>
-                    {/* Add channel form */}
-                    <div className='mb-2'><AddChannelForm /></div>
-                    <FavoritesList />
+                    <div className='mb-2 text-center'>
+                      <div className='text-xs text-gray-500 font-medium'>お気に入りチャンネル</div>
+                    </div>
+                    <ChannelsList />
                   </div>
               </div>
 

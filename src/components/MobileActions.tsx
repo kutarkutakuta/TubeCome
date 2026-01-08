@@ -1,39 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FloatButton, Drawer } from 'antd';
-import { PlusOutlined, StarOutlined } from '@ant-design/icons';
-import AddChannelForm from './AddChannelForm';
-import FavoritesList from './FavoritesList';
+import React from 'react';
+import { FloatButton } from 'antd';
+import { PlusOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
 
 export default function MobileActions() {
-  const [showAdd, setShowAdd] = useState(false);
-  const [showFav, setShowFav] = useState(false);
+  const router = useRouter();
 
   return (
     <>
       <FloatButton.Group shape="circle" style={{ right: 24, bottom: 84 }}>
-        <FloatButton icon={<StarOutlined />} onClick={() => setShowFav(true)} />
-        <FloatButton icon={<PlusOutlined />} type="primary" onClick={() => setShowAdd(true)} />
+        <FloatButton icon={<AppstoreOutlined />} onClick={() => router.push('/channels')} />
+        <FloatButton icon={<PlusOutlined />} type="primary" onClick={() => router.push('/channels')} />
       </FloatButton.Group>
-
-      <Drawer
-        title="チャンネル登録"
-        placement="bottom"
-        onClose={() => setShowAdd(false)}
-        open={showAdd}
-      >
-        <AddChannelForm />
-      </Drawer>
-
-      <Drawer
-        title="お気に入りチャンネル"
-        placement="bottom"
-        onClose={() => setShowFav(false)}
-        open={showFav}
-      >
-        <FavoritesList />
-      </Drawer>
     </>
   );
 }

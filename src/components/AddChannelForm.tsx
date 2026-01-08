@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
-import { addFavorite as idbAddFavorite } from '@/utils/indexeddb';
+import { addChannel as idbAddChannel } from '@/utils/indexeddb';
 
 export default function AddChannelForm() {
   const [form] = Form.useForm();
@@ -27,7 +27,7 @@ export default function AddChannelForm() {
         message.error('channel_not_found');
         return;
       }
-      await idbAddFavorite(channelId, channelTitle);
+      await idbAddChannel(channelId, channelTitle);
       message.success(`登録しました: ${channelTitle}`);
       form.resetFields();
     } catch (err) {
@@ -41,15 +41,14 @@ export default function AddChannelForm() {
     <Form form={form} onFinish={onFinish} layout="vertical">
       <Form.Item
         name="input"
-        label="チャンネル URL / ID を登録"
         rules={[{ required: true, message: 'URLかIDを入力してください' }]}
       >
-        <Input placeholder="チャンネルURLかチャンネルID (例: UC...)" />
-      </Form.Item>
-      <Form.Item>
-        <Button type="primary" htmlType="submit" loading={loading} block>
-          追加
-        </Button>
+        <div className="flex items-center gap-3">
+          <Input className="flex-1" placeholder="チャンネルURLかチャンネルID (例: UC...)" onPressEnter={() => form.submit()} />
+          <Button type="primary" htmlType="submit" loading={loading} aria-label="チャンネル追加">
+            追加
+          </Button>
+        </div>
       </Form.Item>
     </Form>
   );
