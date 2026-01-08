@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { Popover, List } from 'antd';
+import ReplyPreview from './ReplyPreview';
 
-type Item = { id: string; num: number; snippet?: string; authorName?: string; publishedAt?: string; parentNum?: number };
+type Item = { id: string; num: number; snippet?: string; authorName?: string; publishedAt?: string; parentNum?: number; parentSnippet?: string; parentAuthor?: string; parentPublishedAt?: string };
 
 export default function AuthorPostsPreview({ items, authorIndex, authorTotal, authorName }: { items: Item[]; authorIndex: number; authorTotal: number; authorName: string }) {
   if (!items || items.length === 0) return null;
@@ -24,7 +25,7 @@ export default function AuthorPostsPreview({ items, authorIndex, authorTotal, au
             </div>
             {typeof it.parentNum === 'number' ? (
               <div className="mt-1">
-                <a href={`#post-${it.parentNum}`} className="text-blue-600 underline block">&gt;&gt;{it.parentNum}</a>
+                <ReplyPreview parentNum={it.parentNum} snippet={it.parentSnippet} authorName={it.parentAuthor} publishedAt={it.parentPublishedAt} />
               </div>
             ) : null}
             <div className="w-full text-xs text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{it.snippet}</div>

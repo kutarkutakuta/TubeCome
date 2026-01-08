@@ -15,15 +15,14 @@ export default function ReplyPreview({ parentNum, snippet, authorName, published
           <a href={`#post-${parentNum}`} className="text-sm text-[var(--fg-primary)] font-mono">{parentNum} : {authorName || '名無しさん'}</a>
           <div className="text-xs text-[var(--fg-secondary)]">{formattedDate}</div>
         </div>
-        <div className="h-2" />
-        <div className="text-sm text-[var(--fg-primary)] whitespace-pre-wrap">{snippet || '（親コメントがありません）'}</div>
+        <div className="w-full text-xs text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{snippet || '（親コメントがありません）'}</div>
       </div>
     </div>
   );
 
   return (
-    <Popover content={content} trigger={["hover"]} placement="right">
-      <span className="text-blue-600 underline cursor-default">&gt;&gt;{parentNum}</span>
+    <Popover content={content} trigger={["hover","click"]} placement="right">
+      <a href={`#post-${parentNum}`} className="text-blue-600 underline block cursor-pointer">&gt;&gt;{parentNum}</a>
     </Popover>
   );
 }

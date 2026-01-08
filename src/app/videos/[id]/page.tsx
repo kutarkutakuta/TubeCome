@@ -189,7 +189,11 @@ export default async function VideoPage({ params }: Props) {
                 const authorNameItem = postObj?.author || '名無しさん';
                 const publishedAtItem = postObj?.publishedAt || '';
                 const parentNum = postObj?.parentId ? (chronMap.get(postObj.parentId as string) || undefined) : undefined;
-                return { id, num: itNum, snippet, authorName: authorNameItem, publishedAt: publishedAtItem, parentNum };
+                const parentObj = postObj?.parentId ? posts.find(x => x.id === postObj.parentId) : undefined;
+                const parentSnippet = parentObj ? (parentObj.text || '').slice(0, 200) : undefined;
+                const parentAuthor = parentObj?.author;
+                const parentPublishedAt = parentObj?.publishedAt;
+                return { id, num: itNum, snippet, authorName: authorNameItem, publishedAt: publishedAtItem, parentNum, parentSnippet, parentAuthor, parentPublishedAt };
               }).sort((a,b) => a.num - b.num);
 
               return (
