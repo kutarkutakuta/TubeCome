@@ -69,9 +69,7 @@ export default async function ChannelPage({ params }: Props) {
 
     // Limit to most recent 50 items (RSS may include many)
     entries = entries.slice(0, 50);
-
-    // Fetch stats for first 5 videos (SSR) to avoid extra client requests
-    const firstIds = entries.slice(0, 5).map(e => e.id);
+    const firstIds = entries.map(e => e.id);
     const statsMap = firstIds.length > 0 ? await getVideoStatistics(firstIds) : {};
 
     return (

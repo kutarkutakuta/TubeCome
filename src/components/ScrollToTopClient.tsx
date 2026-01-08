@@ -30,7 +30,6 @@ export default function ScrollToTopClient() {
       icon={<UpOutlined />}
       onClick={scrollToTop}
       style={{ right: 30, bottom: 152, display: visible ? 'inline-flex' : 'none', zIndex: 1000 }}
-      tooltip="トップへ"
     />
   );
 }
