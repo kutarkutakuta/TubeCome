@@ -3,7 +3,7 @@
 import React from 'react';
 import { Popover, List } from 'antd';
 
-type Item = { id: string; num: number; snippet?: string; authorName?: string; publishedAt?: string };
+type Item = { id: string; num: number; snippet?: string; authorName?: string; publishedAt?: string; parentNum?: number };
 
 export default function AuthorPostsPreview({ items, authorIndex, authorTotal, authorName }: { items: Item[]; authorIndex: number; authorTotal: number; authorName: string }) {
   if (!items || items.length === 0) return null;
@@ -16,10 +16,18 @@ export default function AuthorPostsPreview({ items, authorIndex, authorTotal, au
         renderItem={(it: Item) => (
           <List.Item style={{ padding: '6px 8px', flexDirection: 'column', alignItems: 'flex-start' }}>
             <div className="w-full flex items-center justify-between">
-              <a href={`#post-${it.num}`} className="text-sm text-[var(--fg-primary)] font-mono">{it.num} : {it.authorName}</a>
+              <div className="flex items-center">
+                <a href={`#post-${it.num}`} className="text-sm text-[var(--fg-primary)] font-mono">{it.num}</a>
+                <span className="ml-2 text-sm text-[var(--fg-primary)]">{it.authorName}</span>
+              </div>
               <div className="text-xs text-[var(--fg-secondary)]">{it.publishedAt ? new Date(it.publishedAt).toLocaleString('ja-JP') : ''}</div>
             </div>
-            <div className="w-full text-xs text-[var(--fg-secondary)] mt-1">{it.snippet}</div>
+            {typeof it.parentNum === 'number' ? (
+              <div className="mt-1">
+                <a href={`#post-${it.parentNum}`} className="text-blue-600 underline block">&gt;&gt;{it.parentNum}</a>
+              </div>
+            ) : null}
+            <div className="w-full text-xs text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{it.snippet}</div>
           </List.Item>
         )}
       />

@@ -188,7 +188,8 @@ export default async function VideoPage({ params }: Props) {
                 const snippet = (postObj?.text || '').replace(/\n/g, ' ').slice(0, 200);
                 const authorNameItem = postObj?.author || '名無しさん';
                 const publishedAtItem = postObj?.publishedAt || '';
-                return { id, num: itNum, snippet, authorName: authorNameItem, publishedAt: publishedAtItem };
+                const parentNum = postObj?.parentId ? (chronMap.get(postObj.parentId as string) || undefined) : undefined;
+                return { id, num: itNum, snippet, authorName: authorNameItem, publishedAt: publishedAtItem, parentNum };
               }).sort((a,b) => a.num - b.num);
 
               return (
