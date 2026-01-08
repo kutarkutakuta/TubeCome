@@ -6,6 +6,8 @@ import { linkify } from '@/utils/linkify';
 import AuthorPostsPreview from '@/components/AuthorPostsPreview';
 import ReplyPreview from '@/components/ReplyPreview';
 import FullDescriptionDrawer from '@/components/FullDescriptionDrawer';
+import ScrollToBottomClient from '@/components/ScrollToBottomClient';
+import ScrollToTopClient from '@/components/ScrollToTopClient';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -87,7 +89,7 @@ export default async function VideoPage({ params }: Props) {
             if (m) {
               return <a key={i} href={`#post-${m[1]}`} className="text-blue-600 underline">&gt;&gt;{m[1]}</a>;
             }
-            return <span key={i}>{part}</span>;
+            return <span key={i}>{linkify(part)}</span>;
           })}
         </>
       );
@@ -228,7 +230,10 @@ export default async function VideoPage({ params }: Props) {
               );
             });
           })()}
-          <div className="mt-4 text-right text-xs"><a href="#top" className="text-[var(--fg-secondary)]">トップへ</a></div>
+          <div>
+            <ScrollToTopClient />
+            <ScrollToBottomClient />
+          </div>
         </div>
       </div>
     );
