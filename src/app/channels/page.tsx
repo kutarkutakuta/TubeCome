@@ -5,7 +5,7 @@ import { List, Button, Popconfirm, message } from 'antd';
 import { StarOutlined, StarFilled, DeleteOutlined, MenuOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 import AddChannelForm from '@/components/AddChannelForm';
-import { getAllChannels, removeChannel as idbRemoveChannel } from '@/utils/indexeddb';
+import { getAllChannels, removeChannel as idbRemoveChannel, addChannel as idbAddChannel } from '@/utils/indexeddb';
 import { getFavorites, addFavorite, removeFavorite } from '@/utils/favorites';
 
 export default function ChannelsPage() {
@@ -18,9 +18,31 @@ export default function ChannelsPage() {
     let mounted = true;
     async function load() {
       const ch = await getAllChannels();
-      if (mounted) setChannels(ch.map((c:any)=>({ id: c.id, title: c.title })));
+      if (mounted) setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail })));
+      await resolveMissingTitles(ch);
     }
     load();
+    async function resolveMissingTitles(channels: Array<any>) {
+      const toResolve = channels.filter((d:any) => (!d.title || d.title === d.id) && /^UC[0-9A-Za-z_-]{20,}$/.test(d.id));
+      if (toResolve.length === 0) return;
+      for (const item of toResolve) {
+        try {
+          const res = await fetch('/api/resolve-channel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ input: item.id }) });
+          if (res.ok) {
+            const json = await res.json();
+            const title = json.channelTitle;
+            if (title) {
+              await idbAddChannel(item.id, title);
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
+      // reload after resolution
+      await load();
+    }
+
     function onChannels() { load(); }
     function onFavs() { if (mounted) setFavorites(getFavorites()); }
     window.addEventListener('channels-changed', onChannels);
@@ -77,7 +99,7 @@ export default function ChannelsPage() {
     }
 
     const ch = await getAllChannels();
-    setChannels(ch.map((c:any)=>({ id: c.id, title: c.title })));
+    setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail })));
   }
 
   function toggleFav(id: string) {

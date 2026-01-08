@@ -10,7 +10,7 @@ import { getFavorites, removeFavorite } from '@/utils/favorites';
 async function fetchChannels() {
   try {
     const arr = await getAllChannels();
-    return arr.map((f:any)=>({ id: f.id, title: f.title }));
+    return arr.map((f:any)=>({ id: f.id, title: f.title, thumbnail: f.thumbnail }));
   } catch (e) {
     return [];
   }

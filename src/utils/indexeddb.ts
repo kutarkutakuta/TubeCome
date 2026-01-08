@@ -39,7 +39,7 @@ function openDB(): Promise<IDBDatabase> {
   });
 }
 
-export async function getAllChannels(): Promise<Array<{id:string,title?:string,createdAt:number,order?:number}>> {
+export async function getAllChannels(): Promise<Array<{id:string,title?:string,createdAt:number,order?:number,thumbnail?:string}>> {
   const db = await openDB();
   // If the store does not exist for any reason, return empty list instead of throwing
   if (!db.objectStoreNames.contains(STORE)) return [];

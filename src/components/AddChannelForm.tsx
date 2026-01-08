@@ -44,7 +44,7 @@ export default function AddChannelForm() {
         rules={[{ required: true, message: 'URLかIDを入力してください' }]}
       >
         <div className="flex items-center gap-3">
-          <Input className="flex-1" placeholder="チャンネルURLかチャンネルID (例: UC...)" onPressEnter={() => form.submit()} />
+          <Input className="flex-1" placeholder="チャンネルURLまたはチャンネルID (例: UC...)" onPressEnter={() => form.submit()} />
           <Button type="primary" htmlType="submit" loading={loading} aria-label="チャンネル追加">
             追加
           </Button>
