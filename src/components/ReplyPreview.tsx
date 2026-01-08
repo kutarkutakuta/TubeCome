@@ -3,11 +3,12 @@
 import React from 'react';
 import { Popover } from 'antd';
 import CommentAuthor from '@/components/CommentAuthor';
+import { formatJaShortDateTime } from '@/utils/date';
 
 export default function ReplyPreview({ parentNum, snippet, authorName, publishedAt, shortId, isOwner }: { parentNum?: number; snippet?: string; authorName?: string; publishedAt?: string; shortId?: string; isOwner?: boolean }) {
   if (!parentNum) return null;
 
-  const formattedDate = publishedAt ? new Date(publishedAt).toLocaleString('ja-JP') : '';
+  const formattedDate = publishedAt ? formatJaShortDateTime(publishedAt) : '';
 
   const content = (
     <div style={{ maxWidth: 420 }}>
@@ -21,14 +22,14 @@ export default function ReplyPreview({ parentNum, snippet, authorName, published
              : {formattedDate}
           </div>
         </div>
-        <div className="w-full text-xs text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{snippet || '（親コメントがありません）'}</div>
+        <div className="w-full text-sm text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{snippet || '（親コメントがありません）'}</div>
       </div>
     </div>
   );
 
   return (
     <Popover content={content} trigger={["hover","click"]} placement="right">
-      <a href={`#post-${parentNum}`} className="text-blue-600 underline block cursor-pointer">&gt;&gt;{parentNum}</a>
+      <span className="text-blue-600 block cursor-pointer">&gt;&gt;{parentNum}</span>
     </Popover>
   );
 }

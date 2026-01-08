@@ -4,6 +4,7 @@ import React from 'react';
 import { Popover, List } from 'antd';
 import ReplyPreview from './ReplyPreview';
 import CommentAuthor from '@/components/CommentAuthor';
+import { formatJaShortDateTime } from '@/utils/date';
 
 type Item = { id: string; num: number; snippet?: string; authorName?: string; publishedAt?: string; shortId?: string; isOwner?: boolean; parentNum?: number; parentSnippet?: string; parentAuthor?: string; parentPublishedAt?: string; parentIsOwner?: boolean; parentShortId?: string };
 
@@ -26,7 +27,7 @@ export default function AuthorPostsPreview({ items, authorIndex, authorTotal, au
                      <span className="ml-1 text-xs text-[var(--fg-secondary)] font-normal">({index + 1}/{items.length})</span>
                   </CommentAuthor> */}
                 </div>
-                {it.publishedAt ? new Date(it.publishedAt).toLocaleString('ja-JP') : ''}
+                {it.publishedAt ? formatJaShortDateTime(it.publishedAt) : ''}
               </div>
             </div>
             {typeof it.parentNum === 'number' ? (
@@ -34,7 +35,7 @@ export default function AuthorPostsPreview({ items, authorIndex, authorTotal, au
                 <ReplyPreview parentNum={it.parentNum} snippet={it.parentSnippet} authorName={it.parentAuthor} publishedAt={it.parentPublishedAt} isOwner={it.parentIsOwner} shortId={it.parentShortId} />
               </div>
             ) : null}
-            <div className="w-full text-xs text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{it.snippet}</div>
+            <div className="w-full text-sm text-[var(--fg-secondary)] mt-1 whitespace-pre-wrap">{it.snippet}</div>
           </List.Item>
         )}
       />
@@ -43,10 +44,10 @@ export default function AuthorPostsPreview({ items, authorIndex, authorTotal, au
 
   return (
     <Popover content={content} title={`${authorName} の投稿 (${authorIndex}/${authorTotal})`} trigger={['hover', 'click']} placement="right">
-      <a className="ml-1 text-sm text-[var(--fg-primary)] cursor-pointer inline-flex items-center">
+      <span className="text-sm text-[var(--fg-primary)] cursor-pointer text-blue-600">
         {authorName}
-        {authorTotal > 1 ? <span className="ml-1 text-xs text-[var(--fg-secondary)]">({authorIndex}/{authorTotal})</span> : null}
-      </a>
+        {authorTotal > 1 ? <span className="ml-1 text-xs">({authorIndex}/{authorTotal})</span> : null}
+      </span>
     </Popover>
   );
 }

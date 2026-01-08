@@ -40,8 +40,8 @@ export default function VideoCard({ v }: { v: Video }) {
         <div className="w-20 h-12 md:w-28 md:h-16 bg-gray-200 flex items-center justify-center text-xs text-gray-500 rounded font-mono">
           サムネ
         </div>
-        <div className="flex-1">
-          <div className="text-sm font-bold line-clamp-2">{decodeHtml(v.title)}</div>
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-bold line-clamp-2 break-words">{decodeHtml(v.title)}</div>
           <div className="text-xs text-gray-500 mt-1">{v.channel} • {v.views} 回視聴 • {v.date}</div>
           <div className="mt-2 flex gap-2">
             <Button 

@@ -118,7 +118,7 @@ export default function ChannelsPage() {
       </div>
 
       <div className="win-window win-title-bar mb-4">
-        <div className="text-lg font-bold">チャンネル一覧</div>
+        <div className="text-lg font-bold">チャンネル</div>
       </div>
 
       <div className="win-window win-inset p-4">

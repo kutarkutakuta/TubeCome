@@ -5,6 +5,7 @@ import { getVideoStatistics } from '@/lib/youtube';
 import PrefetchStats from '@/components/PrefetchStats';
 import CaptureVideoListClient from '@/components/CaptureVideoListClient';
 import { decodeHtml } from '@/utils/html';
+import { formatJaShortDateTime } from '@/utils/date';
 import { YoutubeOutlined } from '@ant-design/icons';
 
 type Props = {
@@ -76,12 +77,11 @@ export default async function ChannelPage({ params }: Props) {
     return (
       <div className="p-4 max-w-3xl mx-auto">
         <div className="win-window win-title-bar mb-4">
-          <div className="flex items-center justify-between w-full">
-            <div className="text-lg font-bold">{feedTitle}</div>
-            <div className="text-xs text-[var(--fg-secondary)]">チャンネル: {id}</div>
-          </div>
+        <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="text-lg font-bold">{feedTitle}</div>
+          <div className="text-xs text-[var(--fg-secondary)] md:whitespace-nowrap md:text-right mt-1 md:mt-0">チャンネルID: {id || ''}</div>
         </div>
-
+        </div>
         <div className="space-y-3">
           {entries.length === 0 && (
             <div className="win-window win-inset p-4">このチャンネルに動画が見つかりませんでした。</div>
@@ -107,20 +107,23 @@ export default async function ChannelPage({ params }: Props) {
                     </a>
                   </div>
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2">
-                    <Link href={`/videos/${v.id}`} className="text-sm font-bold text-[var(--fg-primary)] line-clamp-2">{decodeHtml(v.title)}</Link>
+                    <Link href={`/videos/${v.id}`} className="text-sm font-bold text-[var(--fg-primary)] line-clamp-2 break-words min-w-0 block">{decodeHtml(v.title)}</Link>
                     {v.durationSeconds && (
                       <div className="text-[10px] bg-[var(--bg-panel)] px-1 rounded text-[var(--fg-secondary)]">{formatDuration(v.durationSeconds)}</div>
                     )}
                   </div>
-                  <div className="text-xs text-[var(--fg-secondary)] mt-1">{v.author ? `投稿者: ${decodeHtml(v.author)} • ` : ''}{new Date(v.published).toLocaleString('ja-JP')}</div>
+                  <div className="text-sm text-[var(--fg-secondary)] mt-1">
+                    {v.author ? `投稿者: ${decodeHtml(v.author)} • ` : ''}
+                    {formatJaShortDateTime(v.published)}
+                  </div>
                   {v.description && (
-                    <div className="text-xs mt-2 text-[var(--fg-secondary)]">{v.description.length > 140 ? `${v.description.slice(0, 140)}…` : v.description}</div>
+                    <div className="text-sm mt-2 text-[var(--fg-secondary)]">{v.description.length > 100 ? `${v.description.slice(0, 100)}…` : v.description}</div>
                   )}
 
                   {s && (
-                    <div className="text-xs text-[var(--fg-secondary)] mt-2">再生数: {s.viewCount?.toLocaleString() ?? '—'}{s.commentCount ? ` • コメント: ${s.commentCount.toLocaleString()}` : ''}{s.likeCount ? ` • 高評価: ${s.likeCount.toLocaleString()}` : ''}</div>
+                    <div className="text-sm text-[var(--fg-secondary)] mt-2">再生数: {s.viewCount?.toLocaleString() ?? '—'}{s.commentCount ? ` • コメント: ${s.commentCount.toLocaleString()}` : ''}{s.likeCount ? ` • 高評価: ${s.likeCount.toLocaleString()}` : ''}</div>
                   )}
 
 

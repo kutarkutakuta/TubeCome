@@ -4,6 +4,7 @@ import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
 import { LikeOutlined, DislikeOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { linkify } from '@/utils/linkify';
 import { decodeHtml } from '@/utils/html';
+import { formatJaShortDateTime } from '@/utils/date';
 import AuthorPostsPreview from '@/components/AuthorPostsPreview';
 import ReplyPreview from '@/components/ReplyPreview';
 import CommentAuthor from '@/components/CommentAuthor';
@@ -74,13 +75,13 @@ export default async function VideoPage({ params }: Props) {
     function formatDate(iso?: string) {
       if (!iso) return '';
       const d = new Date(iso);
-      const YYYY = d.getFullYear();
+      const YY = String(d.getFullYear() % 100).padStart(2, '0');
       const MM = String(d.getMonth() + 1).padStart(2, '0');
       const DD = String(d.getDate()).padStart(2, '0');
       const hh = String(d.getHours()).padStart(2, '0');
       const mm = String(d.getMinutes()).padStart(2, '0');
       const ss = String(d.getSeconds()).padStart(2, '0');
-      return `${YYYY}/${MM}/${DD} ${hh}:${mm}:${ss}`;
+      return `${YY}/${MM}/${DD} ${hh}:${mm}:${ss}`;
     }
 
     function renderCommentText(text: string) {
@@ -120,8 +121,8 @@ export default async function VideoPage({ params }: Props) {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-base sm:text-lg font-bold break-words" title={decodeHtml(details.title)}>{decodeHtml(details.title)}</div>
-              <div className="text-xs text-[var(--fg-secondary)]">{details.channelTitle} • {new Date(details.publishedAt).toLocaleString('ja-JP')}</div>
-              <div className="mt-2 text-xs text-[var(--fg-secondary)]">再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}</div>
+              <div className="text-sm text-[var(--fg-secondary)]">{details.channelTitle} • {formatJaShortDateTime(details.publishedAt)}</div>
+              <div className="mt-2 text-sm text-[var(--fg-secondary)]">再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}</div>
             </div>
           </div>
 
