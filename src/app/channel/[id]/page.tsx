@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getVideoStatistics } from '@/lib/youtube';
 import PrefetchStats from '@/components/PrefetchStats';
+import CaptureVideoListClient from '@/components/CaptureVideoListClient';
 import { YoutubeOutlined } from '@ant-design/icons';
 
 type Props = {
@@ -130,6 +131,8 @@ export default async function ChannelPage({ params }: Props) {
 
         {/* Prefetch up to 50 IDs in background */}
         <PrefetchStats ids={entries.map(e => e.id)} />
+        {/* Capture this list for client-side prev/next navigation */}
+        <CaptureVideoListClient list={entries.map(e => ({ id: e.id, title: e.title }))} channelId={id} />
       </div>
     );
   } catch (err) {

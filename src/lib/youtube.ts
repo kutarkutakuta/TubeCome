@@ -140,3 +140,41 @@ export async function getVideoStatistics(ids: string[]): Promise<Record<string, 
 
   return result;
 }
+
+/**
+ * Find previous and next video IDs (and titles) in the channel's uploads playlist.
+ * Returns null if not found or on error.
+ */
+export async function getPrevNextFromUploads(channelId: string, currentVideoId: string) {
+  try {
+    const cResp = await youtube.channels.list({ part: ['contentDetails'], id: [channelId] });
+    const ch = cResp.data.items && cResp.data.items[0];
+    if (!ch) return null;
+    const uploadsId = ch.contentDetails?.relatedPlaylists?.uploads;
+    if (!uploadsId) return null;
+
+    let pageToken: string | undefined = undefined;
+    const acc: Array<{ id?: string; title?: string }> = [];
+    // iterate pages until we find the current video or exhaust some reasonable limit
+    for (let page = 0; page < 20; page++) {
+      const resp: any = await youtube.playlistItems.list({ part: ['snippet', 'contentDetails'], playlistId: uploadsId, maxResults: 50, pageToken });
+      const items = resp.data.items || [];
+      for (const it of items) {
+        acc.push({ id: it.contentDetails?.videoId, title: it.snippet?.title });
+      }
+      const idx = acc.findIndex(x => x.id === currentVideoId);
+      if (idx >= 0) {
+        const prev = idx > 0 ? acc[idx - 1] : null;
+        const next = idx + 1 < acc.length ? acc[idx + 1] : null;
+        return { prev, next };
+      }
+      pageToken = resp.data.nextPageToken || undefined;
+      if (!pageToken) break;
+    }
+
+    return null;
+  } catch (err) {
+    console.error('Error fetching uploads playlist:', err);
+    return null;
+  }
+}

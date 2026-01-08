@@ -8,6 +8,7 @@ import ReplyPreview from '@/components/ReplyPreview';
 import FullDescriptionDrawer from '@/components/FullDescriptionDrawer';
 import ScrollToBottomClient from '@/components/ScrollToBottomClient';
 import ScrollToTopClient from '@/components/ScrollToTopClient';
+import PrevNextClient from '@/components/PrevNextClient';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -95,6 +96,8 @@ export default async function VideoPage({ params }: Props) {
       );
     }
 
+
+
     return (
       <div className="p-4 max-w-3xl mx-auto">
 
@@ -114,7 +117,7 @@ export default async function VideoPage({ params }: Props) {
 
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-lg font-bold">{details.title}</div>
+              <div className="text-base sm:text-lg font-bold break-words" title={details.title}>{details.title}</div>
               <div className="text-xs text-[var(--fg-secondary)]">{details.channelTitle} • {new Date(details.publishedAt).toLocaleString('ja-JP')}</div>
               <div className="mt-2 text-xs text-[var(--fg-secondary)]">再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}</div>
             </div>
@@ -233,6 +236,13 @@ export default async function VideoPage({ params }: Props) {
             <ScrollToTopClient />
             <ScrollToBottomClient />
           </div>
+
+          {/* prev/next links from client-side list if available */}
+          <div>
+            <PrevNextClient currentId={id} />
+          </div>
+
+
         </div>
       </div>
     );
