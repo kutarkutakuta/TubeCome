@@ -30,7 +30,7 @@ export default function ScrollToBottomClient() {
       type="default"
       icon={<DownOutlined />}
       onClick={scrollToBottom}
-      style={{ right: 48, bottom: 104, display: visible ? 'inline-flex' : 'none', zIndex: 1000 }}
+      style={{ right: 30, bottom: 104, display: visible ? 'inline-flex' : 'none', zIndex: 1000 }}
       tooltip="末尾へ"
     />
   );

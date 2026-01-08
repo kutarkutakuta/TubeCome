@@ -16,7 +16,7 @@ async function fetchChannels() {
   }
 }
 
-export default function ChannelsList() {
+export default function ChannelsList({ onSelect }: { onSelect?: () => void }) {
   const [favoriteChannels, setFavoriteChannels] = useState<Array<{id:string,title?:string}>>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -33,27 +33,6 @@ export default function ChannelsList() {
       const ordered = channels.filter((c:any) => favSet.has(c.id)).map((c:any) => ({ id: c.id, title: c.title }));
       const missing = favs.filter((id) => !channels.some((c:any) => c.id === id)).map((id) => ({ id, title: id }));
       const list = [...ordered, ...missing];
-
-      // Try to resolve missing titles for UC ids
-      const toResolve = list.filter((d:any) => (!d.title || d.title === d.id) && /^UC[0-9A-Za-z_-]{20,}$/.test(d.id));
-      if (toResolve.length > 0) {
-        for (const item of toResolve) {
-          try {
-            const res = await fetch('/api/resolve-channel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ input: item.id }) });
-            if (res.ok) {
-              const json = await res.json();
-              const title = json.channelTitle;
-              if (title) {
-                // update IndexedDB so next time it shows title from channels store
-                await import('@/utils/indexeddb').then(m => m.addChannel(item.id, title));
-                item.title = title;
-              }
-            }
-          } catch (e) {
-            // ignore resolution errors
-          }
-        }
-      }
 
       if (mountedFlag) setFavoriteChannels(list);
     }
@@ -89,7 +68,7 @@ export default function ChannelsList() {
               />
 
               <div className="flex-1">
-                <Link href={`/channel/${encodeURIComponent(ch.id)}`}>{ch.title || ch.id}</Link>
+                <Link href={`/channel/${encodeURIComponent(ch.id)}`} onClick={() => onSelect?.()}>{ch.title || ch.id}</Link>
               </div>
             </div>
           </List.Item>
