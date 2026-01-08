@@ -1,9 +1,11 @@
 import React from 'react';
 import Image from 'next/image';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
-import { LikeOutlined, DislikeOutlined } from '@ant-design/icons';
+import { LikeOutlined, DislikeOutlined, YoutubeOutlined } from '@ant-design/icons';
+import { linkify } from '@/utils/linkify';
 import AuthorPostsPreview from '@/components/AuthorPostsPreview';
 import ReplyPreview from '@/components/ReplyPreview';
+import FullDescriptionDrawer from '@/components/FullDescriptionDrawer';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -100,17 +102,38 @@ export default async function VideoPage({ params }: Props) {
 
         <div className="win-window p-3 mb-4">
           <div className="flex gap-4">
-            <div className="w-48 h-28 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]">
-              <Image src={details.thumbnail} alt={`サムネイル: ${details.title}`} width={320} height={180} className="object-cover w-full h-full" />
+            <div className="w-48">
+              <div className="h-28 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]">
+                <Image src={details.thumbnail} alt={`サムネイル: ${details.title}`} width={320} height={180} className="object-cover w-full h-full" />
+              </div>
+              <div className="mt-2 text-center">
+                <a className="win-btn text-xs block flex items-center justify-center yt-btn" href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noreferrer">
+                  <YoutubeOutlined style={{ marginRight: 6 }} />
+                  <span>YouTube</span>
+                </a>
+              </div>
+              <div className="mt-2 text-xs text-[var(--fg-secondary)] text-center">
+                再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}
+              </div>
             </div>
             <div className="flex-1">
-              <div className="text-sm mb-2">{details.description ? (details.description.length > 300 ? details.description.slice(0, 300) + '…' : details.description) : ''}</div>
-              <div className="text-xs text-[var(--fg-secondary)]">再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'} • コメント: {details.statistics?.commentCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}</div>
+              <div className="text-sm mb-2">
+                {details.description ? (
+                  details.description.length > 300 ? (
+                    <>
+                      {linkify(details.description.slice(0, 300))}…
+                      <FullDescriptionDrawer description={details.description} />
+                    </>
+                  ) : (
+                    <>{linkify(details.description)}</>
+                  )
+                ) : ''}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="win-window win-title-bar mb-2">コメント</div>
+        <div className="win-window win-title-bar mb-2">コメント{typeof details.statistics?.commentCount === 'number' ? `（${details.statistics.commentCount.toLocaleString()}）` : ''}</div>
         <div className="space-y-1">
           {posts.length === 0 && (
             <div className="win-window win-inset p-4">コメントが見つかりませんでした。</div>
