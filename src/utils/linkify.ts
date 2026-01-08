@@ -16,7 +16,7 @@ export function linkify(text?: string): React.ReactNode {
     }
     const url = match[0];
     const href = url.startsWith('http') ? url : `https://${url}`;
-    nodes.push(React.createElement('a', { key: `link-${key++}`, href, target: '_blank', rel: 'noreferrer', className: 'text-blue-600 underline' }, url));
+    nodes.push(React.createElement('a', { key: `link-${key++}`, href, target: '_blank', rel: 'noreferrer', className: 'text-blue-600 underline break-words' }, url));
     lastIndex = regex.lastIndex;
   }
 

@@ -97,14 +97,11 @@ export default async function VideoPage({ params }: Props) {
 
     return (
       <div className="p-4 max-w-3xl mx-auto">
-        <div className="win-window win-title-bar mb-4">
-          <div className="text-lg font-bold">{details.title}</div>
-          <div className="text-xs text-[var(--fg-secondary)]">{details.channelTitle} • {new Date(details.publishedAt).toLocaleString('ja-JP')}</div>
-        </div>
+
 
         <div className="win-window p-3 mb-4">
-          <div className="flex gap-4">
-            <div className="w-48">
+          <div className="flex flex-row gap-4 items-start">
+            <div className="w-40 min-w-[10rem] flex-shrink-0">
               <div className="h-28 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]">
                 <Image src={details.thumbnail} alt={`サムネイル: ${details.title}`} width={320} height={180} className="object-cover w-full h-full" />
               </div>
@@ -114,24 +111,26 @@ export default async function VideoPage({ params }: Props) {
                   <span>YouTube</span>
                 </a>
               </div>
-              <div className="mt-2 text-xs text-[var(--fg-secondary)] text-center">
-                再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}
-              </div>
+
             </div>
-            <div className="flex-1">
-              <div className="text-sm mb-2">
-                {details.description ? (
-                  details.description.length > 300 ? (
-                    <>
-                      {linkify(details.description.slice(0, 300))}…
-                      <FullDescriptionDrawer description={details.description} />
-                    </>
-                  ) : (
-                    <>{linkify(details.description)}</>
-                  )
-                ) : ''}
-              </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-lg font-bold">{details.title}</div>
+              <div className="text-xs text-[var(--fg-secondary)]">{details.channelTitle} • {new Date(details.publishedAt).toLocaleString('ja-JP')}</div>
+              <div className="mt-2 text-xs text-[var(--fg-secondary)]">再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}</div>
             </div>
+          </div>
+
+          <div className="mt-4 text-sm break-words">
+            {details.description ? (
+              details.description.length > 300 ? (
+                <>
+                  {linkify(details.description.slice(0, 300))}…
+                  <FullDescriptionDrawer description={details.description} />
+                </>
+              ) : (
+                <>{linkify(details.description)}</>
+              )
+            ) : ''}
           </div>
         </div>
 
@@ -217,7 +216,7 @@ export default async function VideoPage({ params }: Props) {
                     ) : null}
                   </span>
                   </div>
-                  <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed">
+                  <div className="ml-4 text-base text-[var(--fg-primary)] whitespace-pre-wrap leading-relaxed break-words">
                     {typeof parentNum === 'number' && (
                       <>
                         <ReplyPreview parentNum={parentNum} snippet={parentSnippet} authorName={parentAuthor} publishedAt={parentPublishedAt} shortId={parentShortId} />
