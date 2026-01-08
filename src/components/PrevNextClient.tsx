@@ -30,14 +30,14 @@ export default function PrevNextClient({ currentId }: { currentId: string }) {
     <div className="mt-6 flex flex-col sm:flex-row justify-between text-sm gap-2">
       {prev ? (
         <Link href={`/videos/${prev.id}`} className="inline-flex items-center gap-2 max-w-full sm:max-w-[45%] text-sm font-bold text-[var(--fg-primary)]" title={prev.title} aria-label={`前の動画: ${prev.title}`}>
-          <LeftOutlined />
+          <span className="text-lg mr-1"><LeftOutlined /></span>
           <span className="truncate">{prev.title}</span>
         </Link>
       ) : <div />}
       {next ? (
         <Link href={`/videos/${next.id}`} className="inline-flex items-center gap-2 max-w-full sm:max-w-[45%] text-sm font-bold text-[var(--fg-primary)] justify-end" title={next.title} aria-label={`次の動画: ${next.title}`}>
           <span className="truncate text-right">{next.title}</span>
-          <RightOutlined />
+          <span className="text-lg ml-1"><RightOutlined /></span>
         </Link>
       ) : <div />}
     </div>

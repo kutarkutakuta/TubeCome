@@ -4,6 +4,7 @@ import './globals.css';
 import Link from 'next/link';
 import ChannelsList from '../components/FavoritesList';
 import MobileFooterNav from '../components/MobileFooterNav';
+import { AppstoreOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 export const metadata: Metadata = {
   title: 'TubeCome | Retro Edition',
@@ -17,9 +18,9 @@ export default function RootLayout({
 }>) {
   // Menu items for desktop sidebar: 設定, チャンネル, ヘルプ
   const menuItems = [
-    { name: 'チャンネル', href: '/channels', icon: '📺' },
+    { name: 'チャンネル', href: '/channels', icon: <AppstoreOutlined className="text-lg" /> },
     // { name: '設定', href: '/settings', icon: '⚙️' },
-    { name: 'ヘルプ', href: '/help', icon: '❓' },
+    { name: 'ヘルプ', href: '/help', icon: <QuestionCircleOutlined className="text-lg" /> },
   ];
 
   return (
@@ -56,10 +57,10 @@ export default function RootLayout({
                           <li key={item.name}>
                           <Link 
                               href={item.href}
-                              className='flex items-center space-x-2 px-2 py-1.5 hover:bg-[var(--accent-active)] hover:text-[var(--accent-active-fg)] transition-colors cursor-pointer border border-transparent hover:border-dotted hover:border-white'
+                              className='group flex items-center space-x-2 px-2 py-1.5 text-[var(--fg-primary)] hover:bg-[var(--accent-active)] hover:text-[var(--accent-active-fg)] transition-colors cursor-pointer border border-transparent hover:border-dotted hover:border-white'
                           >
-                              <span className='text-lg'>{item.icon}</span>
-                              <span className='font-bold'>{item.name}</span>
+                              <span className='text-lg group-hover:text-[var(--accent-active-fg)]'>{item.icon}</span>
+                              <span className='font-bold group-hover:text-[var(--accent-active-fg)]'>{item.name}</span>
                           </Link>
                           </li>
                       ))}
