@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import ZoomableThumbnail from '@/components/ZoomableThumbnail';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
 import { LikeOutlined, DislikeOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { linkify } from '@/utils/linkify';
@@ -107,10 +107,8 @@ export default async function VideoPage({ params }: Props) {
 
         <div className="win-window p-3 mb-4">
           <div className="flex flex-row gap-4 items-start">
-            <div className="w-40 min-w-[10rem] flex-shrink-0">
-              <div className="h-28 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]">
-                <Image src={details.thumbnail} alt={`サムネイル: ${decodeHtml(details.title)}`} width={320} height={180} className="object-cover w-full h-full" />
-              </div>
+            <div className="w-32 min-w-[8rem] flex-shrink-0">
+                <ZoomableThumbnail src={details.thumbnail} alt={`サムネイル: ${decodeHtml(details.title)}`} width={240} height={135} />
               <div className="mt-2 text-center">
                 <a className="win-btn text-xs block flex items-center justify-center yt-btn" href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noreferrer">
                   <YoutubeOutlined style={{ marginRight: 6 }} />

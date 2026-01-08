@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import ZoomableThumbnail from '@/components/ZoomableThumbnail';
 import { getVideoStatistics } from '@/lib/youtube';
 import PrefetchStats from '@/components/PrefetchStats';
 import CaptureVideoListClient from '@/components/CaptureVideoListClient';
@@ -91,15 +91,7 @@ export default async function ChannelPage({ params }: Props) {
             return (
               <div key={v.id} className="win-window win-inset p-3 flex items-start gap-3">
                 <div className="w-24">
-                  <div className="h-14 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]">
-                    <Image
-                      src={v.thumbnail ?? `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}
-                      alt={`サムネイル: ${v.title}`}
-                      width={160}
-                      height={90}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
+                  <ZoomableThumbnail containerClassName={"h-14 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]"} src={v.thumbnail ?? `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt={`サムネイル: ${v.title}`} width={160} height={90} />
                   <div className="mt-2 text-center">
                     <a className="win-btn text-xs block flex items-center justify-center yt-btn" href={v.link} target="_blank" rel="noreferrer">
                       <YoutubeOutlined style={{ marginRight: 6 }} />
@@ -115,17 +107,14 @@ export default async function ChannelPage({ params }: Props) {
                     )}
                   </div>
                   <div className="text-sm text-[var(--fg-secondary)] mt-1">
-                    {v.author ? `投稿者: ${decodeHtml(v.author)} • ` : ''}
                     {formatJaShortDateTime(v.published)}
+                    {s && ` • 再生数: ${s.viewCount?.toLocaleString() ?? '—'}`}
+                    {s && s.likeCount ? ` • 高評価: ${s.likeCount.toLocaleString()}` : ''}
+                    {s && s.commentCount ? ` • コメント数: ${s.commentCount.toLocaleString()}` : ''}
                   </div>
-                  {v.description && (
+                  {/* {v.description && (
                     <div className="text-sm mt-2 text-[var(--fg-secondary)]">{v.description.length > 100 ? `${v.description.slice(0, 100)}…` : v.description}</div>
-                  )}
-
-                  {s && (
-                    <div className="text-sm text-[var(--fg-secondary)] mt-2">再生数: {s.viewCount?.toLocaleString() ?? '—'}{s.commentCount ? ` • コメント: ${s.commentCount.toLocaleString()}` : ''}{s.likeCount ? ` • 高評価: ${s.likeCount.toLocaleString()}` : ''}</div>
-                  )}
-
+                  )} */}
 
                 </div>
               </div>
