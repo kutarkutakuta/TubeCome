@@ -40,18 +40,8 @@ export default function RootLayout({
                       </h1>
                   </div>
               </div>
-              
-              {/* Favorites List */}
-              <div className='p-2'>
-                <div className='mt-2'>
-                    <div className='mb-2 text-center'>
-                      <div className='text-xs text-gray-500 font-medium'>お気に入りチャンネル</div>
-                    </div>
-                    <ChannelsList />
-                  </div>
-              </div>
 
-              <div className='flex-1 overflow-y-auto p-2'>
+              <div className='flex-1 p-2'>
                   <div className='win-outset bg-[var(--bg-panel)] p-1'>
                       <ul className='space-y-1'>
                       {menuItems.map((item) => (
@@ -66,6 +56,16 @@ export default function RootLayout({
                           </li>
                       ))}
                       </ul>
+
+                      {/* Favorites List (placed right under menu) */}
+                      <div className='mt-3 border-t border-[rgba(255,255,255,0.02)] pt-2'>
+                        <div className='mb-2 text-center'>
+                          <div className='text-xs text-gray-500 font-medium'>お気に入りチャンネル</div>
+                        </div>
+                        <div className='max-h-[calc(100vh-220px)] overflow-y-auto'>
+                          <ChannelsList />
+                        </div>
+                      </div>
                   </div>
 
               </div>

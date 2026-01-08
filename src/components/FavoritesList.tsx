@@ -51,7 +51,7 @@ export default function ChannelsList({ onSelect }: { onSelect?: () => void }) {
   if (!mounted) return null;
 
   return (
-    <div className="max-h-[60vh] overflow-y-auto">
+    <div className="w-full">
       <List
         dataSource={favoriteChannels}
         renderItem={(ch) => (
