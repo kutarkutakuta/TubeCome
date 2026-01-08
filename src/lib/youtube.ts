@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { decodeHtml } from '@/utils/html';
 
 const youtube = google.youtube({
   version: 'v3',
@@ -53,11 +54,11 @@ export async function getVideoDetails(id: string) {
 
     return {
       id: item.id as string,
-      title: snippet?.title || '',
-      description: snippet?.description || '',
+      title: decodeHtml(snippet?.title || ''),
+      description: decodeHtml(snippet?.description || ''),
       thumbnail: snippet?.thumbnails?.high?.url || snippet?.thumbnails?.default?.url || '',
       channelId: snippet?.channelId || '',
-      channelTitle: snippet?.channelTitle || '',
+      channelTitle: decodeHtml(snippet?.channelTitle || ''),
       publishedAt: snippet?.publishedAt || '',
       duration: cd?.duration || '',
       statistics: {
@@ -160,7 +161,7 @@ export async function getPrevNextFromUploads(channelId: string, currentVideoId: 
       const resp: any = await youtube.playlistItems.list({ part: ['snippet', 'contentDetails'], playlistId: uploadsId, maxResults: 50, pageToken });
       const items = resp.data.items || [];
       for (const it of items) {
-        acc.push({ id: it.contentDetails?.videoId, title: it.snippet?.title });
+        acc.push({ id: it.contentDetails?.videoId, title: decodeHtml(it.snippet?.title || '') });
       }
       const idx = acc.findIndex(x => x.id === currentVideoId);
       if (idx >= 0) {

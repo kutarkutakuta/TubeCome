@@ -14,6 +14,8 @@ type Video = {
   date: string;
 };
 
+import { decodeHtml } from '@/utils/html';
+
 export default function VideoCard({ v }: { v: Video }) {
   const [isFav, setIsFav] = useState(false);
 
@@ -39,7 +41,7 @@ export default function VideoCard({ v }: { v: Video }) {
           サムネ
         </div>
         <div className="flex-1">
-          <div className="text-sm font-bold line-clamp-2">{v.title}</div>
+          <div className="text-sm font-bold line-clamp-2">{decodeHtml(v.title)}</div>
           <div className="text-xs text-gray-500 mt-1">{v.channel} • {v.views} 回視聴 • {v.date}</div>
           <div className="mt-2 flex gap-2">
             <Button 

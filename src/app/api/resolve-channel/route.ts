@@ -27,8 +27,14 @@ export async function POST(req: Request) {
       if (rss.ok) {
         const txt = await rss.text();
         const m = txt.match(/<title>([^<]+)<\/title>/);
-        const title = m ? m[1] : null;
-        return NextResponse.json({ channelId: ch, channelTitle: title });
+        const titleRaw = m ? m[1] : null;
+        try {
+          const { decodeHtml } = await import('@/utils/html');
+          const title = titleRaw ? decodeHtml(titleRaw) : null;
+          return NextResponse.json({ channelId: ch, channelTitle: title });
+        } catch (e) {
+          return NextResponse.json({ channelId: ch, channelTitle: titleRaw });
+        }
       }
     } catch (e) {}
     return NextResponse.json({ channelId: ch });
@@ -43,8 +49,14 @@ export async function POST(req: Request) {
       if (rss.ok) {
         const txt = await rss.text();
         const m = txt.match(/<title>([^<]+)<\/title>/);
-        const title = m ? m[1] : null;
-        return NextResponse.json({ channelId: ch, channelTitle: title });
+        const titleRaw = m ? m[1] : null;
+        try {
+          const { decodeHtml } = await import('@/utils/html');
+          const title = titleRaw ? decodeHtml(titleRaw) : null;
+          return NextResponse.json({ channelId: ch, channelTitle: title });
+        } catch (e) {
+          return NextResponse.json({ channelId: ch, channelTitle: titleRaw });
+        }
       }
     } catch (e) {}
     return NextResponse.json({ channelId: ch });

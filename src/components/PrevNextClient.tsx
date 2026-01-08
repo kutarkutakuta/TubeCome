@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { decodeHtml } from '@/utils/html';
 
 export default function PrevNextClient({ currentId }: { currentId: string }) {
   const [prev, setPrev] = useState<{ id?: string; title?: string } | null>(null);
@@ -31,12 +32,12 @@ export default function PrevNextClient({ currentId }: { currentId: string }) {
       {prev ? (
         <Link href={`/videos/${prev.id}`} className="inline-flex items-center gap-2 max-w-full sm:max-w-[45%] text-sm font-bold text-[var(--fg-primary)]" title={prev.title} aria-label={`前の動画: ${prev.title}`}>
           <span className="text-lg mr-1"><LeftOutlined /></span>
-          <span className="truncate">{prev.title}</span>
+          <span className="truncate">{decodeHtml(prev.title)}</span>
         </Link>
       ) : <div />}
       {next ? (
         <Link href={`/videos/${next.id}`} className="inline-flex items-center gap-2 max-w-full sm:max-w-[45%] text-sm font-bold text-[var(--fg-primary)] justify-end" title={next.title} aria-label={`次の動画: ${next.title}`}>
-          <span className="truncate text-right">{next.title}</span>
+          <span className="truncate text-right">{decodeHtml(next.title)}</span>
           <span className="text-lg ml-1"><RightOutlined /></span>
         </Link>
       ) : <div />}

@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
 import { LikeOutlined, DislikeOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { linkify } from '@/utils/linkify';
+import { decodeHtml } from '@/utils/html';
 import AuthorPostsPreview from '@/components/AuthorPostsPreview';
 import ReplyPreview from '@/components/ReplyPreview';
 import CommentAuthor from '@/components/CommentAuthor';
@@ -107,7 +108,7 @@ export default async function VideoPage({ params }: Props) {
           <div className="flex flex-row gap-4 items-start">
             <div className="w-40 min-w-[10rem] flex-shrink-0">
               <div className="h-28 win-outset overflow-hidden rounded-sm bg-[var(--bg-panel)]">
-                <Image src={details.thumbnail} alt={`サムネイル: ${details.title}`} width={320} height={180} className="object-cover w-full h-full" />
+                <Image src={details.thumbnail} alt={`サムネイル: ${decodeHtml(details.title)}`} width={320} height={180} className="object-cover w-full h-full" />
               </div>
               <div className="mt-2 text-center">
                 <a className="win-btn text-xs block flex items-center justify-center yt-btn" href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noreferrer">
@@ -118,7 +119,7 @@ export default async function VideoPage({ params }: Props) {
 
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-base sm:text-lg font-bold break-words" title={details.title}>{details.title}</div>
+              <div className="text-base sm:text-lg font-bold break-words" title={decodeHtml(details.title)}>{decodeHtml(details.title)}</div>
               <div className="text-xs text-[var(--fg-secondary)]">{details.channelTitle} • {new Date(details.publishedAt).toLocaleString('ja-JP')}</div>
               <div className="mt-2 text-xs text-[var(--fg-secondary)]">再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}</div>
             </div>

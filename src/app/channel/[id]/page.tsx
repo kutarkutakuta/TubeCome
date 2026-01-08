@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { getVideoStatistics } from '@/lib/youtube';
 import PrefetchStats from '@/components/PrefetchStats';
 import CaptureVideoListClient from '@/components/CaptureVideoListClient';
+import { decodeHtml } from '@/utils/html';
 import { YoutubeOutlined } from '@ant-design/icons';
 
 type Props = {
@@ -29,7 +30,7 @@ export default async function ChannelPage({ params }: Props) {
 
     const text = await res.text();
     const feedTitleMatch = text.match(/<title>([^<]+)<\/title>/);
-    const feedTitle = feedTitleMatch ? feedTitleMatch[1] : id;
+    const feedTitle = feedTitleMatch ? decodeHtml(feedTitleMatch[1]) : id;
 
     let entries: Array<{ id: string; title: string; published: string; link: string; thumbnail?: string; description?: string; durationSeconds?: string; author?: string }> = [];
     const entryRe = /<entry>([\s\S]*?)<\/entry>/g;
@@ -108,12 +109,12 @@ export default async function ChannelPage({ params }: Props) {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
-                    <Link href={`/videos/${v.id}`} className="text-sm font-bold text-[var(--fg-primary)] line-clamp-2">{v.title}</Link>
+                    <Link href={`/videos/${v.id}`} className="text-sm font-bold text-[var(--fg-primary)] line-clamp-2">{decodeHtml(v.title)}</Link>
                     {v.durationSeconds && (
                       <div className="text-[10px] bg-[var(--bg-panel)] px-1 rounded text-[var(--fg-secondary)]">{formatDuration(v.durationSeconds)}</div>
                     )}
                   </div>
-                  <div className="text-xs text-[var(--fg-secondary)] mt-1">{v.author ? `投稿者: ${v.author} • ` : ''}{new Date(v.published).toLocaleString('ja-JP')}</div>
+                  <div className="text-xs text-[var(--fg-secondary)] mt-1">{v.author ? `投稿者: ${decodeHtml(v.author)} • ` : ''}{new Date(v.published).toLocaleString('ja-JP')}</div>
                   {v.description && (
                     <div className="text-xs mt-2 text-[var(--fg-secondary)]">{v.description.length > 140 ? `${v.description.slice(0, 140)}…` : v.description}</div>
                   )}
