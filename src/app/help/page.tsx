@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import QuotaUsageClient from '@/components/QuotaUsageClient';
 
 export default function HelpPage() {
   return (
@@ -43,6 +44,10 @@ export default function HelpPage() {
         <section>
           <h2 className="font-bold">お問い合わせ</h2>
           <a href="https://x.com/kutakutar_ff11" target="_blank" rel="noreferrer" className="text-sm text-blue-600 underline">https://x.com/kutakutar_ff11</a>
+        </section>
+
+        <section>
+          <QuotaUsageClient />
         </section>
       </div>
 
