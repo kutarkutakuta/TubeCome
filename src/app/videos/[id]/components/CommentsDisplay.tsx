@@ -7,7 +7,7 @@ import { linkify } from '@/utils/linkify';
 import AuthorPostsPreview from '@/app/videos/[id]/components/AuthorPostsPreview';
 import ReplyPreview from '@/app/videos/[id]/components/ReplyPreview';
 import CommentAuthor from '@/app/videos/[id]/components/CommentAuthor';
-import { getVideoComments, saveVideoComments } from '@/utils/indexeddb';
+import { getVideoComments, saveVideoComments, getViewedCommentIds } from '@/utils/indexeddb';
 
 interface Comment {
   id: string;
@@ -112,6 +112,29 @@ export default function CommentsDisplay({
     }
 
     mergeComments();
+
+    // Load viewed IDs for UI and listen for updates
+    let mounted = true;
+    async function loadViewed() {
+      try {
+        const ids = await getViewedCommentIds(videoId);
+        if (!mounted) return;
+        setViewedIds(new Set(ids || []));
+      } catch (e) {
+        // ignore
+      }
+    }
+    loadViewed();
+
+    function onViewedChanged(e: any) {
+      if (!e?.detail?.videoId) return;
+      if (e.detail.videoId === videoId) {
+        loadViewed();
+      }
+    }
+    window.addEventListener('viewed-comments-changed', onViewedChanged as EventListener);
+
+    return () => { mounted = false; window.removeEventListener('viewed-comments-changed', onViewedChanged as EventListener); };
   }, [videoId, serverComments]);
 
   function formatDate(iso?: string) {
@@ -143,6 +166,7 @@ export default function CommentsDisplay({
 
   const chrono = [...posts].sort((a, b) => (new Date(a.publishedAt).getTime() || 0) - (new Date(b.publishedAt).getTime() || 0));
   const chronMap = new Map(chrono.map((p, i) => [p.id, i + 1]));
+  const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
 
   const authorGroups = new Map() as Map<string, string[]>;
   for (const p of chrono) {
@@ -169,13 +193,11 @@ export default function CommentsDisplay({
       {chrono.map((p) => {
         const num = chronMap.get(p.id) || 0;
         const isMissing = missingIds.has(p.id);
+        const isViewed = viewedIds.has(p.id);
 
         if (p.isDeleted) {
           return (
             <div key={p.id}>
-              <div id={`post-${num}`} data-comment-num={num} data-comment-id={p.id} className="mb-6">
-                <div className="text-[var(--fg-secondary)]">{num} : <span className="font-bold">【あぼーん】</span></div>
-              </div>
               {isMissing && (
                 <div className="my-4 py-2 px-4 text-center text-xs font-bold bg-yellow-100 text-yellow-800 border-2 border-yellow-400 rounded">
                   ⚠️ この付近のコメントが一部表示されていません
@@ -227,7 +249,7 @@ export default function CommentsDisplay({
 
         return (
           <div key={p.id}>
-            <div id={`post-${num}`} data-comment-num={num} data-comment-id={p.id} className="mb-6 break-words font-mono">
+            <div id={`post-${num}`} data-comment-num={num} data-comment-id={p.id} className={`mb-6 break-words font-mono ${isViewed ? 'bg-gray-100' : ''}`}>
             <div className="mb-2 text-sm text-[var(--fg-secondary)] flex flex-wrap items-center">
               <span className="mr-2">{num} :</span>
               

@@ -36,19 +36,39 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const commentId = entry.target.getAttribute('data-comment-id');
-            if (commentId && !viewedIdsRef.current.has(commentId)) {
-              viewedIdsRef.current.add(commentId);
-              
-              // Throttle DB saves: only save every 2 seconds
-              if (saveTimerRef.current) {
-                clearTimeout(saveTimerRef.current);
+
+            // Helper to add and schedule save
+            function addViewed(id: string | null) {
+              if (!id) return;
+              const sid = String(id);
+              if (!viewedIdsRef.current.has(sid)) {
+                viewedIdsRef.current.add(sid);
+                // Throttle DB saves: only save every 2 seconds
+                if (saveTimerRef.current) {
+                  clearTimeout(saveTimerRef.current);
+                }
+                saveTimerRef.current = setTimeout(() => {
+                  saveViewedCommentIds(videoId, Array.from(viewedIdsRef.current)).catch(err => {
+                    console.error('Failed to save viewed comment IDs:', err);
+                  });
+                }, 2000);
               }
-              
-              saveTimerRef.current = setTimeout(() => {
-                saveViewedCommentIds(videoId, Array.from(viewedIdsRef.current)).catch(err => {
-                  console.error('Failed to save viewed comment IDs:', err);
-                });
-              }, 2000);
+            }
+
+            // Mark the current visible comment as viewed
+            addViewed(commentId);
+
+            // Also mark the previous comment (the one immediately before in DOM) as viewed
+            try {
+              const prev = (entry.target as Element).previousElementSibling as Element | null;
+              if (prev) {
+                // If previous sibling is a wrapper, look for element with data-comment-id inside
+                const prevCommentEl = prev.matches && prev.hasAttribute && prev.hasAttribute('data-comment-id') ? prev : prev.querySelector && prev.querySelector('[data-comment-id]') as Element | null;
+                const prevId = prevCommentEl ? prevCommentEl.getAttribute('data-comment-id') : null;
+                addViewed(prevId);
+              }
+            } catch (e) {
+              // ignore DOM errors
             }
           }
         });

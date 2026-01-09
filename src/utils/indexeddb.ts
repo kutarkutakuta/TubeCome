@@ -345,7 +345,15 @@ export async function saveViewedCommentIds(videoId: string, commentIds: string[]
       existing.lastViewed = Date.now();
       store.put(existing);
     };
-    tx.oncomplete = () => resolve();
+    tx.oncomplete = () => {
+      try {
+        // Notify other clients/components that viewed IDs changed for this video
+        window.dispatchEvent(new CustomEvent('viewed-comments-changed', { detail: { videoId } }));
+      } catch (e) {
+        // ignore if not running in browser context
+      }
+      resolve();
+    };
     tx.onerror = () => reject(tx.error);
   });
 }
