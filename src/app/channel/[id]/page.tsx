@@ -6,7 +6,6 @@ import MarkChannelVisited from '@/app/channel/[id]/components/MarkChannelVisited
 import CommentBadgeClient from '@/app/channel/[id]/components/CommentBadgeClient';
 import NewVideoBadge from '@/app/channel/[id]/components/NewVideoBadge';
 import { getVideoStatistics } from '@/lib/youtube';
-import PrefetchStats from '@/app/channel/[id]/components/PrefetchStats';
 import CaptureVideoListClient from '@/app/channel/[id]/components/CaptureVideoListClient';
 import { decodeHtml } from '@/utils/html';
 import { formatJaShortDateTime } from '@/utils/date';
@@ -127,8 +126,6 @@ export default async function ChannelPage({ params }: Props) {
           })}
         </div>
 
-        {/* Prefetch up to 50 IDs in background */}
-        <PrefetchStats ids={entries.map(e => e.id)} />
         {/* Capture this list for client-side prev/next navigation */}
         <CaptureVideoListClient list={entries.map(e => ({ id: e.id, title: e.title }))} channelId={id} />
       </div>

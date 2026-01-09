@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { decodeHtml } from '@/utils/html';
+import { logYouTubeQuota } from '@/utils/supabase/serverClient';
 
 const youtube = google.youtube({
   version: 'v3',
@@ -28,6 +29,9 @@ export async function getCommentThreads({ videoId, maxResults = 20, pageToken }:
       order: 'time', // 直近の動画のコメントを取得とあるが、コメント自体も新しい順が良いか?
       textFormat: 'plainText',
     });
+
+    // Log quota (1 unit per commentThreads.list call)
+    try { await logYouTubeQuota('commentThreads.list', 1, { videoId }); } catch (e) {}
 
     return response.data;
   } catch (error: any) {
@@ -102,6 +106,10 @@ export async function getVideoDetails(id: string) {
       part: ['snippet', 'contentDetails', 'statistics'],
       id: [id],
     });
+
+    // Log quota for videos.list (video details)
+    try { await logYouTubeQuota('videos.list_details', 1, { id }); } catch (e) {}
+
     const item = response.data.items && response.data.items[0];
     if (!item) return null;
 
@@ -163,6 +171,8 @@ export async function getVideoStatistics(ids: string[]): Promise<Record<string, 
         maxResults: 50,
       });
 
+      // Log quota for videos.list statistics (single call covers many ids)
+      try { await logYouTubeQuota('videos.list_statistics', 1, { ids: toFetch }); } catch (e) {}
       const items = response.data.items || [];
       // fill fetched data
       const fetchedMap: Record<string, VideoStats | null> = {};
@@ -206,6 +216,10 @@ export async function getVideoStatistics(ids: string[]): Promise<Record<string, 
 export async function getPrevNextFromUploads(channelId: string, currentVideoId: string) {
   try {
     const cResp = await youtube.channels.list({ part: ['contentDetails'], id: [channelId] });
+
+    // Log channels.list quota
+    try { await logYouTubeQuota('channels.list', 1, { channelId }); } catch (e) {}
+
     const ch = cResp.data.items && cResp.data.items[0];
     if (!ch) return null;
     const uploadsId = ch.contentDetails?.relatedPlaylists?.uploads;
@@ -216,6 +230,10 @@ export async function getPrevNextFromUploads(channelId: string, currentVideoId: 
     // iterate pages until we find the current video or exhaust some reasonable limit
     for (let page = 0; page < 20; page++) {
       const resp: any = await youtube.playlistItems.list({ part: ['snippet', 'contentDetails'], playlistId: uploadsId, maxResults: 50, pageToken });
+
+      // Log playlistItems.list quota per page
+      try { await logYouTubeQuota('playlistItems.list', 1, { playlistId: uploadsId, pageToken: pageToken || null }); } catch (e) {}
+
       const items = resp.data.items || [];
       for (const it of items) {
         acc.push({ id: it.contentDetails?.videoId, title: decodeHtml(it.snippet?.title || '') });
