@@ -6,7 +6,8 @@ export default function PrefetchStats({ ids }: { ids: string[] }) {
   useEffect(() => {
     // fire-and-forget fetch - not critical
     if (!ids || ids.length === 0) return;
-    fetch('/api/video-stats', { method: 'POST', body: JSON.stringify({ ids }) }).catch(() => {});
+    const safeIds = ids.slice(0, 50).map(encodeURIComponent).join(',');
+    fetch(`/api/video-stats?ids=${safeIds}`, { method: 'GET' }).catch(() => {});
   }, [ids]);
 
   return null;

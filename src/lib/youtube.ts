@@ -31,12 +31,7 @@ export async function getCommentThreads({ videoId, maxResults = 20, pageToken }:
 
     return response.data;
   } catch (error: any) {
-    console.error('Error fetching YouTube comments:', error);
-
-    // Detect "comments disabled" errors from YouTube API and return
-    // an empty commentThreads-shaped response so callers can handle it
-    // without crashing. The API error shape may appear under several
-    // properties depending on the client, so check common locations.
+    // Detect "comments disabled" errors from YouTube API and handle quietly
     const msg = String(error?.message || '').toLowerCase();
     const apiErrors = error?.errors || error?.response?.data?.error?.errors || [];
     const commentsDisabled =
@@ -49,9 +44,12 @@ export async function getCommentThreads({ videoId, maxResults = 20, pageToken }:
       });
 
     if (commentsDisabled) {
+      // Info-level log for expected condition (less noisy during dev)
+      console.info('YouTube comments disabled for video:', videoId);
       return { items: [], pageInfo: { totalResults: 0, resultsPerPage: 0 } } as any;
     }
 
+    console.error('Error fetching YouTube comments:', error);
     throw error;
   }
 }
