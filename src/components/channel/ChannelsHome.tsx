@@ -141,14 +141,14 @@ export default function ChannelsHome() {
       <div className="win-window win-title-bar mb-4">
         <div className="flex items-center justify-between">
           <div className="text-lg font-bold">チャンネル</div>
-          <Button 
+          {/* <Button 
             size="small" 
             icon={<ReloadOutlined />} 
             onClick={handleTestReset}
             type="dashed"
           >
             テスト: 新着リセット
-          </Button>
+          </Button> */}
         </div>
       </div>
 
