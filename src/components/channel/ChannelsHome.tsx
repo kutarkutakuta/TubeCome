@@ -16,6 +16,8 @@ export default function ChannelsHome() {
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [newCounts, setNewCounts] = useState<Record<string, number>>({});
 
+  const [quotaInfo, setQuotaInfo] = useState<{ total?: number; warnThreshold?: number; errorThreshold?: number } | null>(null);
+
   useEffect(() => {
     let mounted = true;
     async function load() {
@@ -24,6 +26,17 @@ export default function ChannelsHome() {
       await resolveMissingTitles(ch);
       // Fetch new video counts for each channel
       fetchNewCounts(ch);
+
+      // fetch quota usage for this client
+      try {
+        const res = await fetch('/api/quota-usage');
+        if (res.ok) {
+          const json = await res.json();
+          if (mounted) setQuotaInfo(json);
+        }
+      } catch (e) {
+        // ignore
+      }
     }
     load();
     async function resolveMissingTitles(channels: Array<any>) {
@@ -132,10 +145,19 @@ export default function ChannelsHome() {
   return (
     <div className="p-4 max-w-3xl mx-auto">
            <div className="win-inset bg-white p-2 mb-4">
-        <h1 className="text-2xl italic font-black text-slate-800 tracking-tighter">
-          <span className="text-blue-700">Tube</span>Come
-          <span className="text-red-500 text-xs ml-1">2000</span>
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl italic font-black text-slate-800 tracking-tighter">
+            <span className="text-blue-700">Tube</span>Come
+            <span className="text-red-500 text-xs ml-1">2000</span>
+          </h1>
+          <div className="text-xs text-[var(--fg-secondary)] text-right">
+            {quotaInfo ? (
+              <div>API使用量: <strong>{quotaInfo.total ?? 0}</strong> / warn {quotaInfo.warnThreshold} / error {quotaInfo.errorThreshold}</div>
+            ) : (
+              <div className="text-[var(--fg-secondary)]">API使用量: 読み込み中…</div>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="win-window win-title-bar mb-4">

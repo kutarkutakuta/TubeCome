@@ -11,3 +11,10 @@ CREATE TABLE IF NOT EXISTS youtube_quota_logs (
 );
 
 CREATE INDEX IF NOT EXISTS idx_youtube_quota_logs_date_type ON youtube_quota_logs (date, type);
+
+-- 003_add_client_ip_to_youtube_quota_logs.sql
+ALTER TABLE youtube_quota_logs
+  ADD COLUMN IF NOT EXISTS client_ip TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_youtube_quota_logs_date_client_ip
+  ON youtube_quota_logs (date, client_ip);
