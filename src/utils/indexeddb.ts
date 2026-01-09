@@ -233,6 +233,74 @@ export async function saveViewedCommentNumber(videoId: string, maxViewedNumber: 
   });
 }
 
+// Save the maximum viewed comment index (position in comment list)
+export async function saveMaxViewedIndex(videoId: string, maxIndex: number) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readwrite');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const getReq = store.get(videoId);
+    getReq.onsuccess = () => {
+      const existing = getReq.result || { videoId };
+      existing.maxViewedIndex = maxIndex;
+      existing.lastViewed = Date.now();
+      store.put(existing);
+    };
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Save actual fetched comment count
+export async function saveActualCommentCount(videoId: string, actualCount: number) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readwrite');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const getReq = store.get(videoId);
+    getReq.onsuccess = () => {
+      const existing = getReq.result || { videoId };
+      existing.actualCommentCount = actualCount;
+      existing.lastViewed = Date.now();
+      store.put(existing);
+    };
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Get actual fetched comment count
+export async function getActualCommentCount(videoId: string): Promise<number | null> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains(VIDEO_STATS_STORE)) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readonly');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const req = store.get(videoId);
+    req.onsuccess = () => {
+      const result = req.result;
+      resolve(result?.actualCommentCount ?? null);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Get the maximum viewed comment index
+export async function getMaxViewedIndex(videoId: string): Promise<number | null> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains(VIDEO_STATS_STORE)) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readonly');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const req = store.get(videoId);
+    req.onsuccess = () => {
+      const result = req.result;
+      resolve(result?.maxViewedIndex ?? null);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
 // Get previous comment count for a video
 export async function getPreviousCommentCount(videoId: string): Promise<number | null> {
   const db = await openDB();

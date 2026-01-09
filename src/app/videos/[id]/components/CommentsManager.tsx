@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getVideoComments, saveVideoComments } from '@/utils/indexeddb';
+import { getVideoComments, saveVideoComments, saveVideoCommentCount } from '@/utils/indexeddb';
 
 export default function CommentsManager({ 
   videoId, 
@@ -51,6 +51,9 @@ export default function CommentsManager({
 
         // Save merged comments for next time
         await saveVideoComments(videoId, finalComments);
+        
+        // Save current comment count for badge calculation
+        await saveVideoCommentCount(videoId, finalComments.length);
 
         // Detect gaps: check if there are missing chronological numbers
         // We'll use timestamps to detect if there's a big time gap suggesting missing comments

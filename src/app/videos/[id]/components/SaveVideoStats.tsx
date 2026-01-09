@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from 'react';
-import { saveViewedCommentIds, getPreviousCommentCount, saveVideoCommentCount, getViewedCommentIds } from '@/utils/indexeddb';
+import { saveViewedCommentIds, getPreviousCommentCount, saveVideoCommentCount, getViewedCommentIds, saveMaxViewedIndex, saveActualCommentCount } from '@/utils/indexeddb';
 
 export default function SaveVideoStats({ videoId, totalComments, allCommentIds }: { videoId: string; totalComments: number; allCommentIds: string[] }) {
   const viewedIdsRef = useRef(new Set<string>());
@@ -24,6 +24,8 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
           // Comment count has changed or is being saved for the first time
           await saveVideoCommentCount(videoId, totalComments);
         }
+        // Also save actual fetched comment count
+        await saveActualCommentCount(videoId, allCommentIds.length);
       } catch (err) {
         console.error('Failed to save comment count:', err);
       }
@@ -48,9 +50,22 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
                   clearTimeout(saveTimerRef.current);
                 }
                 saveTimerRef.current = setTimeout(() => {
-                  saveViewedCommentIds(videoId, Array.from(viewedIdsRef.current)).catch(err => {
+                  const viewedIds = Array.from(viewedIdsRef.current);
+                  saveViewedCommentIds(videoId, viewedIds).catch(err => {
                     console.error('Failed to save viewed comment IDs:', err);
                   });
+                  
+                  // Calculate and save max viewed index
+                  let maxIndex = -1;
+                  for (const id of viewedIds) {
+                    const idx = allCommentIds.indexOf(id);
+                    if (idx > maxIndex) maxIndex = idx;
+                  }
+                  if (maxIndex >= 0) {
+                    saveMaxViewedIndex(videoId, maxIndex).catch(err => {
+                      console.error('Failed to save max viewed index:', err);
+                    });
+                  }
                 }, 2000);
               }
             }
@@ -90,7 +105,18 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
         clearTimeout(saveTimerRef.current);
         // Save final state on unmount
         if (viewedIdsRef.current.size > 0) {
-          saveViewedCommentIds(videoId, Array.from(viewedIdsRef.current)).catch(() => {});
+          const viewedIds = Array.from(viewedIdsRef.current);
+          saveViewedCommentIds(videoId, viewedIds).catch(() => {});
+          
+          // Save max viewed index
+          let maxIndex = -1;
+          for (const id of viewedIds) {
+            const idx = allCommentIds.indexOf(id);
+            if (idx > maxIndex) maxIndex = idx;
+          }
+          if (maxIndex >= 0) {
+            saveMaxViewedIndex(videoId, maxIndex).catch(() => {});
+          }
         }
       }
     };

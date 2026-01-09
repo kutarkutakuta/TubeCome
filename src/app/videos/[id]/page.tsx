@@ -78,7 +78,7 @@ export default async function VideoPage({ params }: Props) {
 
     return (
       <div className="p-4 max-w-3xl mx-auto">
-        <SaveVideoStats videoId={id} totalComments={posts.length} allCommentIds={posts.map(p => p.id)} />
+        <SaveVideoStats videoId={id} totalComments={details.statistics?.commentCount ?? 0} allCommentIds={posts.map(p => p.id)} />
         <LastViewedMarker videoId={id} allCommentIds={posts.map(p => p.id)} />
 
         <div className="win-window p-3 mb-4">
