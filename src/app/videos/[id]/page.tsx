@@ -96,7 +96,12 @@ export default async function VideoPage({ params }: Props) {
             <div className="flex-1 min-w-0">
               <div className="text-base sm:text-lg font-bold break-words" title={decodeHtml(details.title)}>{decodeHtml(details.title)}</div>
               <div className="text-sm text-[var(--fg-secondary)]">{details.channelTitle} • {formatJaShortDateTime(details.publishedAt)}</div>
-              <div className="mt-2 text-sm text-[var(--fg-secondary)]">再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}{details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}</div>
+              <div className="mt-2 text-sm text-[var(--fg-secondary)]">
+                再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}
+                {details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}
+                {details.statistics?.commentCount ? ` • コメント数: ${details.statistics.commentCount.toLocaleString()}` : ''}
+
+              </div>
             </div>
           </div>
 
@@ -114,11 +119,7 @@ export default async function VideoPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="win-window win-title-bar mb-2">コメント（{posts.length.toLocaleString()}）{typeof details.statistics?.commentCount === 'number' && details.statistics.commentCount !== posts.length ? ` / 全${details.statistics.commentCount.toLocaleString()}件` : ''}</div>
         <div className="space-y-1">
-          {posts.length === 0 && (
-            <div className="win-window win-inset p-4">コメントが見つかりませんでした。</div>
-          )}
 
           <CommentsDisplay videoId={id} serverComments={posts} channelId={details.channelId} />
 

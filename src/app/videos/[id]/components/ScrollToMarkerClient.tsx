@@ -34,7 +34,6 @@ export default function ScrollToMarkerClient() {
       icon={<EyeOutlined />}
       onClick={scrollToMarker}
       style={{ right: 30, bottom: 200, display: visible ? 'inline-flex' : 'none', zIndex: 1000 }}
-      tooltip="ここまで読んだ位置へ"
     />
   );
 }
