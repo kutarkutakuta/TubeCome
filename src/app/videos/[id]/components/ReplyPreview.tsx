@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Popover } from 'antd';
-import CommentAuthor from '@/components/comment/CommentAuthor';
+import CommentAuthor from '@/app/videos/[id]/components/CommentAuthor';
 import { formatJaShortDateTime } from '@/utils/date';
 
 export default function ReplyPreview({ parentNum, snippet, authorName, publishedAt, shortId, isOwner }: { parentNum?: number; snippet?: string; authorName?: string; publishedAt?: string; shortId?: string; isOwner?: boolean }) {

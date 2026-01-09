@@ -10,7 +10,7 @@ import { decodeHtml } from '@/utils/html';
 import { formatJaShortDateTime } from '@/utils/date';
 import AuthorPostsPreview from '@/app/videos/[id]/components/AuthorPostsPreview';
 import ReplyPreview from '@/app/videos/[id]/components/ReplyPreview';
-import CommentAuthor from '@/components/comment/CommentAuthor';
+import CommentAuthor from '@/app/videos/[id]/components/CommentAuthor';
 import FullDescriptionDrawer from '@/app/videos/[id]/components/FullDescriptionDrawer';
 import ScrollToBottomClient from '@/app/videos/[id]/components/ScrollToBottomClient';
 import ScrollToTopClient from '@/app/videos/[id]/components/ScrollToTopClient';
