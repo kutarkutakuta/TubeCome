@@ -4,7 +4,7 @@ import './globals.css';
 import Link from 'next/link';
 import ChannelsList from '../components/FavoritesList';
 import MobileFooterNav from '../components/MobileFooterNav';
-import { AppstoreOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons';
 
 export const metadata: Metadata = {
   title: 'TubeCome 2000 - レトロ風 YouTube コメントビューア',
@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   // Menu items for desktop sidebar: 設定, チャンネル, ヘルプ
   const menuItems = [
-    { name: 'チャンネル', href: '/channels', icon: <AppstoreOutlined className="text-lg" /> },
+    { name: 'ホーム', href: '/', icon: <HomeOutlined className="text-lg" /> },
     // { name: '設定', href: '/settings', icon: '⚙️' },
     { name: 'ヘルプ', href: '/help', icon: <QuestionCircleOutlined className="text-lg" /> },
   ];

@@ -21,7 +21,7 @@ export default function HelpPage() {
           <br/>
           <h2 className="font-bold">使い方</h2>
           <ul className="list-disc list-inside text-sm mt-2">
-            <li>チャンネルの登録：<Link href="/channels">チャンネル</Link> ページからチャンネル ID を追加します。</li>
+            <li>チャンネルの登録：<Link href="/">ホーム</Link> のページでチャンネルURLまたはチャンネルIDを追加します。</li>
             <li>お気に入り：チャンネル一覧で <strong>★</strong> をクリックしてお気に入りに追加できます。サイドバーはお気に入りのみ表示します。</li>
             <li>並び替え：チャンネル一覧でドラッグ＆ドロップして順序を変更できます（サイドバーにも反映されます）。</li>
             <li>動画ページ：チャンネルに紐づく動画を直近50個まで閲覧できます。</li>
@@ -35,7 +35,7 @@ export default function HelpPage() {
             <li><strong>Cookie</strong>：内部 API 用に HTTPOnly cookie <code>tubecome_client_id</code> を利用することがあります（識別用途で、安全に扱います）。</li>
             <li><strong>外部API</strong>：チャンネル解決や動画統計取得のために YouTube の RSS あるいは Invidious などの外部サービスに問い合わせる場合があります。</li>
             <li><strong>第三者トラッキング</strong>：本アプリは分析ツールや広告のトラッキングを使用していません。</li>
-            <li><strong>データ削除</strong>：チャンネルは <Link href="/channels">チャンネル</Link> ページで削除可能です。ローカルストレージ（ブラウザのサイトデータ）を消去すると全データが削除されます。</li>
+            <li><strong>データ削除</strong>：チャンネルは <Link href="/">ホーム</Link> のページで削除可能です。ローカルストレージ（ブラウザのサイトデータ）を消去すると全データが削除されます。</li>
           </ul>
           <p className="text-sm mt-2">ご不明点やデータに関する要請（削除・エクスポートなど）がある場合は、管理者へお問い合わせください（連絡先は下記）。</p>
         </section>

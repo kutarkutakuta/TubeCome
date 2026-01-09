@@ -9,7 +9,7 @@ import { getAllChannels, removeChannel as idbRemoveChannel, addChannel as idbAdd
 import { getFavorites, addFavorite, removeFavorite } from '@/utils/favorites';
 import { countNewVideos } from '@/utils/rss';
 
-export default function ChannelsPage() {
+export default function ChannelsHome() {
   const [channels, setChannels] = useState<Array<{id:string,title?:string,lastVisited?:number}>>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [draggingId, setDraggingId] = useState<string | null>(null);

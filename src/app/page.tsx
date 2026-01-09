@@ -1,8 +1,7 @@
-﻿import { redirect } from 'next/navigation';
+﻿import ChannelsHome from '@/components/ChannelsHome';
 
 export default function Home() {
-  // Redirect root route to the Channels page so initial page is Channels
-  redirect('/channels');
+  return <ChannelsHome />;
 }
 
 

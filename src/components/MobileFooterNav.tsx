@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { LeftOutlined, PlusOutlined, AppstoreOutlined, QuestionCircleOutlined, StarOutlined } from '@ant-design/icons';
+import { LeftOutlined, HomeOutlined, AppstoreOutlined, QuestionCircleOutlined, StarOutlined } from '@ant-design/icons';
 import { Drawer } from 'antd';
 import FavoritesList from './FavoritesList';
 
@@ -13,12 +13,12 @@ export default function MobileFooterNav() {
     <>
       <nav className="md:hidden fixed bottom-0 left-0 w-full h-16 mobile-nav-container grid grid-cols-3 z-50 px-2 pb-1">
         <Link
-          href="/channels"
+          href="/"
           className="flex flex-col items-center justify-center active:bg-gray-300 rounded-sm m-0.5"
         >
           <div className="win-btn p-1 flex flex-col items-center w-full h-full justify-center">
-            <AppstoreOutlined className="text-lg leading-none mb-0.5" />
-            <span className="text-[10px] font-bold">チャンネル</span>
+            <HomeOutlined className="text-lg leading-none mb-0.5" />
+            <span className="text-[10px] font-bold">ホーム</span>
           </div>
         </Link>
 
