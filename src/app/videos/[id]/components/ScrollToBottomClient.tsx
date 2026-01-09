@@ -3,8 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { FloatButton } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
+import { saveViewedCommentNumber } from '@/utils/indexeddb';
 
-export default function ScrollToBottomClient() {
+export default function ScrollToBottomClient({ videoId }: { videoId: string }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -21,7 +22,27 @@ export default function ScrollToBottomClient() {
     };
   }, []);
 
-  function scrollToBottom() {
+  async function scrollToBottom() {
+    // Find the highest comment number before scrolling
+    const commentElements = document.querySelectorAll('[data-comment-num]');
+    let maxCommentNum = 0;
+    commentElements.forEach(el => {
+      const num = parseInt(el.getAttribute('data-comment-num') || '0', 10);
+      if (num > maxCommentNum) {
+        maxCommentNum = num;
+      }
+    });
+
+    // Mark all comments as viewed
+    if (maxCommentNum > 0) {
+      try {
+        await saveViewedCommentNumber(videoId, maxCommentNum);
+      } catch (err) {
+        console.error('Failed to save viewed comment number:', err);
+      }
+    }
+
+    // Then scroll to bottom
     window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
   }
 

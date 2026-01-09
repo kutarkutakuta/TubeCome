@@ -252,7 +252,7 @@ export default async function VideoPage({ params }: Props) {
           <div>
             <ScrollToTopClient />
             <ScrollToMarkerClient />
-            <ScrollToBottomClient />
+            <ScrollToBottomClient videoId={id} />
           </div>
 
           {/* prev/next links from client-side list if available */}
