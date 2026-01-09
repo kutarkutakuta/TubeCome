@@ -58,14 +58,18 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
             // Mark the current visible comment as viewed
             addViewed(commentId);
 
-            // Also mark the previous comment (the one immediately before in DOM) as viewed
+            // Mark all comments BEFORE this one in DOM order as viewed
             try {
-              const prev = (entry.target as Element).previousElementSibling as Element | null;
-              if (prev) {
-                // If previous sibling is a wrapper, look for element with data-comment-id inside
-                const prevCommentEl = prev.matches && prev.hasAttribute && prev.hasAttribute('data-comment-id') ? prev : prev.querySelector && prev.querySelector('[data-comment-id]') as Element | null;
-                const prevId = prevCommentEl ? prevCommentEl.getAttribute('data-comment-id') : null;
-                addViewed(prevId);
+              const allCommentEls = Array.from(document.querySelectorAll('[data-comment-id]'));
+              const currentIndex = allCommentEls.findIndex(el => el.getAttribute('data-comment-id') === commentId);
+              
+              if (currentIndex >= 0) {
+                // Mark all comments from start to current as viewed
+                for (let i = 0; i <= currentIndex; i++) {
+                  const el = allCommentEls[i];
+                  const id = el.getAttribute('data-comment-id');
+                  if (id) addViewed(id);
+                }
               }
             } catch (e) {
               // ignore DOM errors

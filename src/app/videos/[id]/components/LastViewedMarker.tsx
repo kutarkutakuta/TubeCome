@@ -34,38 +34,26 @@ export default function LastViewedMarker({ videoId, allCommentIds }: { videoId: 
         const existingMarker = document.getElementById('last-viewed-marker');
         if (existingMarker) existingMarker.remove();
 
-        // Use DOM order to find first unread element
+        // Find the LAST viewed comment in DOM order (max position)
         const commentEls = Array.from(document.querySelectorAll('[data-comment-id]')) as Element[];
-        let insertTarget: Element | null = null;
-        let insertBefore = true;
+        let lastViewedEl: Element | null = null;
 
         for (const el of commentEls) {
           const id = el.getAttribute('data-comment-id');
-          if (!id) continue;
-          if (!viewedSet.has(String(id))) {
-            insertTarget = el;
-            insertBefore = true;
-            break;
+          if (id && viewedSet.has(String(id))) {
+            lastViewedEl = el; // Keep updating to find the last one
           }
         }
 
-        // If all were viewed (or no DOM unread found), place marker after last comment element
-        if (!insertTarget && commentEls.length > 0) {
-          insertTarget = commentEls[commentEls.length - 1];
-          insertBefore = false;
-        }
-
-        if (insertTarget) {
+        // Place marker AFTER the last viewed comment (next position)
+        if (lastViewedEl) {
           const marker = document.createElement('div');
           marker.id = 'last-viewed-marker';
           marker.className = 'my-4 py-2 px-4 text-center text-sm font-bold text-white bg-gradient-to-r from-pink-400 to-pink-600 rounded-lg shadow-md';
           marker.textContent = '━━━━━ ここまで読んだ ━━━━━';
 
-          if (insertBefore) {
-            insertTarget.parentNode?.insertBefore(marker, insertTarget);
-          } else {
-            insertTarget.parentNode?.insertBefore(marker, insertTarget.nextSibling);
-          }
+          // Insert after the last viewed comment
+          lastViewedEl.parentNode?.insertBefore(marker, lastViewedEl.nextSibling);
 
           setTimeout(() => {
             marker.scrollIntoView({ behavior: 'smooth', block: 'center' });
