@@ -23,6 +23,11 @@ export default function LastViewedMarker({ videoId }: { videoId: string }) {
         
         // Insert before the first unread comment
         nextCommentEl.parentNode?.insertBefore(marker, nextCommentEl);
+        
+        // Auto-scroll to marker after a brief delay
+        setTimeout(() => {
+          marker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
       }
     }).catch(err => {
       console.error('Failed to insert last viewed marker:', err);

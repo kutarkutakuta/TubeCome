@@ -14,6 +14,7 @@ import CommentAuthor from '@/app/videos/[id]/components/CommentAuthor';
 import FullDescriptionDrawer from '@/app/videos/[id]/components/FullDescriptionDrawer';
 import ScrollToBottomClient from '@/app/videos/[id]/components/ScrollToBottomClient';
 import ScrollToTopClient from '@/app/videos/[id]/components/ScrollToTopClient';
+import ScrollToMarkerClient from '@/app/videos/[id]/components/ScrollToMarkerClient';
 import PrevNextClient from '@/app/videos/[id]/components/PrevNextClient';
 
 type Props = {
@@ -250,6 +251,7 @@ export default async function VideoPage({ params }: Props) {
           })()}
           <div>
             <ScrollToTopClient />
+            <ScrollToMarkerClient />
             <ScrollToBottomClient />
           </div>
 
