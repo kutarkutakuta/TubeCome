@@ -155,7 +155,8 @@ export default function ChannelsHome() {
       <div className="win-window win-inset p-4">
         <div className="mb-4"><AddChannelForm /></div>
         {channels.length > 0 && (
-          <div className="mb-2 text-xs text-gray-500">ドラッグして順番を並べ替えられます（ハンドルを掴んで移動）</div>
+          <div className="mb-2 text-xs text-gray-500">ドラッグして順番を並べ替えられます（ハンドルを掴んで移動）
+          </div>
         )}
         <List
           dataSource={channels}
@@ -188,7 +189,7 @@ export default function ChannelsHome() {
                 />
 
                 <div className="flex-1 min-w-0 flex items-center gap-2">
-                  <Link href={`/channel/${encodeURIComponent(ch.id)}`} className="truncate flex-1">{ch.title || ch.id}</Link>
+                  <Link href={`/channel/${encodeURIComponent(ch.id)}`} className="flex-1 whitespace-normal break-words">{ch.title || ch.id}</Link>
                   {newCounts[ch.id] > 0 && (
                     <Badge count={newCounts[ch.id]} showZero={false} color="#ff85c1" />
                   )}
