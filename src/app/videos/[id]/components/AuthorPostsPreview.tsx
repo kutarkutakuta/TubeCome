@@ -3,7 +3,7 @@
 import React from 'react';
 import { Popover, List } from 'antd';
 import ReplyPreview from './ReplyPreview';
-import CommentAuthor from '@/components/CommentAuthor';
+import CommentAuthor from '../../../../components/comment/CommentAuthor';
 import { formatJaShortDateTime } from '@/utils/date';
 
 type Item = { id: string; num: number; snippet?: string; authorName?: string; publishedAt?: string; shortId?: string; isOwner?: boolean; parentNum?: number; parentSnippet?: string; parentAuthor?: string; parentPublishedAt?: string; parentIsOwner?: boolean; parentShortId?: string };

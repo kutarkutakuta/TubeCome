@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { List, Button, Popconfirm, message, Badge } from 'antd';
 import { StarOutlined, StarFilled, DeleteOutlined, MenuOutlined, ReloadOutlined } from '@ant-design/icons';
 import Link from 'next/link';
-import AddChannelForm from '@/components/AddChannelForm';
+import AddChannelForm from './AddChannelForm';
 import { getAllChannels, removeChannel as idbRemoveChannel, addChannel as idbAddChannel, resetAllLastVisitedForTest } from '@/utils/indexeddb';
 import { getFavorites, addFavorite, removeFavorite } from '@/utils/favorites';
 import { countNewVideos } from '@/utils/rss';

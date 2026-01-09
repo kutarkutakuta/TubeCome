@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Button } from 'antd';
 import { StarOutlined, StarFilled, MessageOutlined } from '@ant-design/icons';
-import { addFavorite, getFavorites, removeFavorite } from '../utils/favorites';
+import { addFavorite, getFavorites, removeFavorite } from '@/utils/favorites';
 
 type Video = {
   id: string;

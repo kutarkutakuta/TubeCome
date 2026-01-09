@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { LeftOutlined, HomeOutlined, AppstoreOutlined, QuestionCircleOutlined, StarOutlined } from '@ant-design/icons';
 import { Drawer } from 'antd';
-import FavoritesList from './FavoritesList';
+import FavoritesList from '@/components/channel/FavoritesList';
 
 export default function MobileFooterNav() {
   const [favOpen, setFavOpen] = useState(false);

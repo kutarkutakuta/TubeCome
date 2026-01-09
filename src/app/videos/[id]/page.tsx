@@ -1,20 +1,20 @@
 import React from 'react';
 import Link from 'next/link';
-import ZoomableThumbnail from '@/components/ZoomableThumbnail';
-import SaveVideoStats from '@/components/SaveVideoStats';
-import LastViewedMarker from '@/components/LastViewedMarker';
+import ZoomableThumbnail from '@/components/video/ZoomableThumbnail';
+import SaveVideoStats from '@/app/videos/[id]/components/SaveVideoStats';
+import LastViewedMarker from '@/app/videos/[id]/components/LastViewedMarker';
 import { getVideoDetails, getCommentThreads } from '@/lib/youtube';
 import { LikeOutlined, DislikeOutlined, YoutubeOutlined } from '@ant-design/icons';
 import { linkify } from '@/utils/linkify';
 import { decodeHtml } from '@/utils/html';
 import { formatJaShortDateTime } from '@/utils/date';
-import AuthorPostsPreview from '@/components/AuthorPostsPreview';
-import ReplyPreview from '@/components/ReplyPreview';
-import CommentAuthor from '@/components/CommentAuthor';
-import FullDescriptionDrawer from '@/components/FullDescriptionDrawer';
-import ScrollToBottomClient from '@/components/ScrollToBottomClient';
-import ScrollToTopClient from '@/components/ScrollToTopClient';
-import PrevNextClient from '@/components/PrevNextClient';
+import AuthorPostsPreview from '@/app/videos/[id]/components/AuthorPostsPreview';
+import ReplyPreview from '@/app/videos/[id]/components/ReplyPreview';
+import CommentAuthor from '@/components/comment/CommentAuthor';
+import FullDescriptionDrawer from '@/app/videos/[id]/components/FullDescriptionDrawer';
+import ScrollToBottomClient from '@/app/videos/[id]/components/ScrollToBottomClient';
+import ScrollToTopClient from '@/app/videos/[id]/components/ScrollToTopClient';
+import PrevNextClient from '@/app/videos/[id]/components/PrevNextClient';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;

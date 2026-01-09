@@ -2,8 +2,8 @@
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import './globals.css';
 import Link from 'next/link';
-import ChannelsList from '../components/FavoritesList';
-import MobileFooterNav from '../components/MobileFooterNav';
+import ChannelsList from '@/components/channel/FavoritesList';
+import MobileFooterNav from '@/components/navigation/MobileFooterNav';
 import { AppstoreOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons';
 
 export const metadata: Metadata = {
