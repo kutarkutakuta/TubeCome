@@ -1,31 +1,39 @@
 "use client";
 import { useEffect } from 'react';
-import { getMaxViewedCommentNumber } from '@/utils/indexeddb';
+import { getViewedCommentIds } from '@/utils/indexeddb';
 
-export default function LastViewedMarker({ videoId }: { videoId: string }) {
+export default function LastViewedMarker({ videoId, allCommentIds }: { videoId: string; allCommentIds: string[] }) {
   useEffect(() => {
-    getMaxViewedCommentNumber(videoId).then(maxViewed => {
-      if (maxViewed === null || maxViewed === 0) return;
+    getViewedCommentIds(videoId).then(viewedIds => {
+      if (!viewedIds || viewedIds.length === 0) return;
+      
+      const viewedSet = new Set(viewedIds);
       
       // Check if marker already exists
       const existingMarker = document.getElementById('last-viewed-marker');
       if (existingMarker) existingMarker.remove();
       
-      // Find the comment element with number = maxViewed + 1 (first unread)
-      const nextCommentEl = document.querySelector(`[data-comment-num="${maxViewed + 1}"]`);
+      // Find the first unread comment
+      let firstUnreadId: string | null = null;
+      for (const commentId of allCommentIds) {
+        if (!viewedSet.has(commentId)) {
+          firstUnreadId = commentId;
+          break;
+        }
+      }
       
       let insertTarget: Element | null = null;
       let insertBefore = true;
       
-      if (nextCommentEl) {
+      if (firstUnreadId) {
         // There are unread comments - insert before the first unread
-        insertTarget = nextCommentEl;
+        insertTarget = document.querySelector(`[data-comment-id="${firstUnreadId}"]`);
         insertBefore = true;
       } else {
         // All comments are read - insert after the last comment
-        const lastCommentEl = document.querySelector(`[data-comment-num="${maxViewed}"]`);
-        if (lastCommentEl) {
-          insertTarget = lastCommentEl;
+        const lastCommentId = allCommentIds[allCommentIds.length - 1];
+        if (lastCommentId) {
+          insertTarget = document.querySelector(`[data-comment-id="${lastCommentId}"]`);
           insertBefore = false;
         }
       }
@@ -52,7 +60,7 @@ export default function LastViewedMarker({ videoId }: { videoId: string }) {
     }).catch(err => {
       console.error('Failed to insert last viewed marker:', err);
     });
-  }, [videoId]);
+  }, [videoId, allCommentIds]);
 
   return null;
 }

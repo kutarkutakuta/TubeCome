@@ -2,8 +2,9 @@
 const DB_NAME = 'tubecome_db';
 const STORE = 'channels';
 const VIDEO_STATS_STORE = 'videoStats';
+const VIDEO_COMMENTS_STORE = 'videoComments';
 // Bump version to ensure migrations run when the store name changed previously
-const VERSION = 3;
+const VERSION = 4;
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -20,6 +21,11 @@ function openDB(): Promise<IDBDatabase> {
       // Ensure videoStats store exists
       if (!db.objectStoreNames.contains(VIDEO_STATS_STORE)) {
         db.createObjectStore(VIDEO_STATS_STORE, { keyPath: 'videoId' });
+      }
+
+      // Ensure videoComments store exists
+      if (!db.objectStoreNames.contains(VIDEO_COMMENTS_STORE)) {
+        db.createObjectStore(VIDEO_COMMENTS_STORE, { keyPath: 'videoId' });
       }
 
       // If an older 'favorites' store exists, migrate its data into 'channels'
@@ -197,10 +203,15 @@ export async function saveVideoCommentCount(videoId: string, commentCount: numbe
   return new Promise<void>((resolve, reject) => {
     const tx = db.transaction(VIDEO_STATS_STORE, 'readwrite');
     const store = tx.objectStore(VIDEO_STATS_STORE);
-    const payload = { videoId, commentCount, lastViewed: Date.now() };
-    const req = store.put(payload);
-    req.onsuccess = () => resolve();
-    req.onerror = () => reject(req.error);
+    const getReq = store.get(videoId);
+    getReq.onsuccess = () => {
+      const existing = getReq.result || { videoId };
+      existing.commentCount = commentCount;
+      existing.lastViewed = Date.now();
+      store.put(existing);
+    };
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
   });
 }
 
@@ -289,5 +300,68 @@ export async function getPreviousCommentCounts(videoIds: string[]): Promise<Reco
         }
       };
     }
+  });
+}
+
+// Save video comments to IndexedDB
+export async function saveVideoComments(videoId: string, comments: any[]) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(VIDEO_COMMENTS_STORE, 'readwrite');
+    const store = tx.objectStore(VIDEO_COMMENTS_STORE);
+    const payload = { videoId, comments, lastUpdated: Date.now() };
+    const req = store.put(payload);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Get video comments from IndexedDB
+export async function getVideoComments(videoId: string): Promise<any[] | null> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains(VIDEO_COMMENTS_STORE)) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(VIDEO_COMMENTS_STORE, 'readonly');
+    const store = tx.objectStore(VIDEO_COMMENTS_STORE);
+    const req = store.get(videoId);
+    req.onsuccess = () => {
+      const result = req.result;
+      resolve(result?.comments ?? null);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Save viewed comment IDs (instead of numbers)
+export async function saveViewedCommentIds(videoId: string, commentIds: string[]) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readwrite');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const getReq = store.get(videoId);
+    getReq.onsuccess = () => {
+      const existing = getReq.result || { videoId };
+      existing.viewedCommentIds = commentIds;
+      existing.lastViewed = Date.now();
+      store.put(existing);
+    };
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Get viewed comment IDs
+export async function getViewedCommentIds(videoId: string): Promise<string[] | null> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains(VIDEO_STATS_STORE)) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(VIDEO_STATS_STORE, 'readonly');
+    const store = tx.objectStore(VIDEO_STATS_STORE);
+    const req = store.get(videoId);
+    req.onsuccess = () => {
+      const result = req.result;
+      resolve(result?.viewedCommentIds ?? null);
+    };
+    req.onerror = () => reject(req.error);
   });
 }

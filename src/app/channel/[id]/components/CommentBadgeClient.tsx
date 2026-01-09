@@ -1,28 +1,30 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { Badge } from 'antd';
-import { getMaxViewedCommentNumber } from '@/utils/indexeddb';
+import { getViewedCommentIds } from '@/utils/indexeddb';
 
 export default function CommentBadgeClient({ videoId, currentCount }: { videoId: string; currentCount?: number }) {
-  const [newCommentCount, setNewCommentCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (typeof currentCount !== 'number' || currentCount === 0) return;
     
-    getMaxViewedCommentNumber(videoId).then(maxViewed => {
-      if (maxViewed === null) {
-        // 初回閲覧: コメント数全体を表示
-        setNewCommentCount(currentCount);
-      } else if (currentCount > maxViewed) {
-        // 前回閲覧以降の新着分を表示
-        setNewCommentCount(currentCount - maxViewed);
+    getViewedCommentIds(videoId).then(viewedIds => {
+      if (viewedIds === null || viewedIds.length === 0) {
+        // 未訪問: コメント数全体を表示
+        setUnreadCount(currentCount);
+      } else {
+        // 既読済みの数を引く
+        const viewedCount = viewedIds.length;
+        const unread = Math.max(0, currentCount - viewedCount);
+        setUnreadCount(unread);
       }
     }).catch(err => {
-      console.error('Failed to get max viewed comment number:', err);
+      console.error('Failed to get viewed comment IDs:', err);
     });
   }, [videoId, currentCount]);
 
-  if (newCommentCount === 0) return null;
+  if (unreadCount === 0) return null;
 
-  return <Badge count={newCommentCount} color="#faad14" overflowCount={99} />;
+  return <Badge count={unreadCount} color="#faad14" overflowCount={99} />;
 }

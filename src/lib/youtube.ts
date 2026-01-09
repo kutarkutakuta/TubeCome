@@ -57,6 +57,45 @@ export async function getCommentThreads({ videoId, maxResults = 20, pageToken }:
 }
 
 /**
+ * 複数ページのコメントを取得（最大5ページ=500件）
+ */
+export async function getAllCommentThreads(videoId: string, maxPages: number = 5) {
+  const allItems: any[] = [];
+  let pageToken: string | undefined = undefined;
+  let pageCount = 0;
+
+  try {
+    while (pageCount < maxPages) {
+      const response = await getCommentThreads({
+        videoId,
+        maxResults: 100,
+        pageToken,
+      });
+
+      if (response.items && response.items.length > 0) {
+        allItems.push(...response.items);
+      }
+
+      pageCount++;
+
+      // Check if there are more pages
+      if (response.nextPageToken) {
+        pageToken = response.nextPageToken;
+      } else {
+        // No more pages
+        break;
+      }
+    }
+
+    return { items: allItems, totalFetched: allItems.length, pagesFetched: pageCount };
+  } catch (error) {
+    console.error('Error fetching all comment threads:', error);
+    // Return what we've collected so far
+    return { items: allItems, totalFetched: allItems.length, pagesFetched: pageCount };
+  }
+}
+
+/**
  * 動画の詳細（snippet, contentDetails, statistics）を取得して整形して返す
  */
 export async function getVideoDetails(id: string) {
