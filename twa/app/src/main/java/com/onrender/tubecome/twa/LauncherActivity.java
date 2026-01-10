@@ -19,7 +19,6 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.content.Intent;
 
 
 
@@ -48,24 +47,7 @@ public class LauncherActivity
         // Get the original launch Url.
         Uri uri = super.getLaunchingUrl();
 
-        Intent intent = getIntent();
-        if (intent != null) {
-            String action = intent.getAction();
-            if (Intent.ACTION_SEND.equals(action)) {
-                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-                if (sharedText != null && !sharedText.isEmpty()) {
-                    // Build URL with proper hostname and input parameter
-                    String hostname = getString(R.string.hostName);
-                    Uri target = new Uri.Builder()
-                            .scheme("https")
-                            .authority(hostname)
-                            .path("/")
-                            .appendQueryParameter("input", sharedText)
-                            .build();
-                    return target;
-                }
-            }
-        }
+        
 
         return uri;
     }
