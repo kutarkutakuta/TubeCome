@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export async function GET(req: NextRequest) {
+  const text = req.nextUrl.searchParams.get('text') || '';
+  const url = req.nextUrl.searchParams.get('url') || '';
+  const input = url || text || '';
+  
+  const target = new URL(req.nextUrl.origin);
+  target.pathname = '/';
+  if (input) target.searchParams.set('input', input);
+
+  return NextResponse.redirect(target.toString(), 302);
+}
+
 export async function POST(req: NextRequest) {
   const contentType = req.headers.get('content-type') || '';
   let text = '';

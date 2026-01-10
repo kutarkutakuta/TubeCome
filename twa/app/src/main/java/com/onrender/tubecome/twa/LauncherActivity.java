@@ -32,23 +32,6 @@ public class LauncherActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Handle ACTION_SEND before calling super.onCreate()
-        Intent intent = getIntent();
-        if (intent != null && Intent.ACTION_SEND.equals(intent.getAction())) {
-            String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-            if (sharedText != null && !sharedText.isEmpty()) {
-                // Create new VIEW intent with proper URL
-                Uri targetUri = Uri.parse("https://tubecome.onrender.com/")
-                        .buildUpon()
-                        .appendQueryParameter("input", sharedText)
-                        .build();
-                Intent newIntent = new Intent(Intent.ACTION_VIEW, targetUri);
-                newIntent.setPackage(getPackageName());
-                newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                setIntent(newIntent);
-            }
-        }
-        
         super.onCreate(savedInstanceState);
         // Setting an orientation crashes the app due to the transparent background on Android 8.0
         // Oreo and below. We only set the orientation on Oreo and above. This only affects the
@@ -63,7 +46,14 @@ public class LauncherActivity
 
     @Override
     protected Uri getLaunchingUrl() {
-        // Normal launch - use default URL
+        Intent intent = getIntent();
+        if (intent != null && Intent.ACTION_SEND.equals(intent.getAction())) {
+            String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+            if (sharedText != null && !sharedText.isEmpty()) {
+                // Redirect to PWA Web Share Target endpoint with proper URL encoding
+                return Uri.parse("https://tubecome.onrender.com/share?text=" + Uri.encode(sharedText));
+            }
+        }
         return super.getLaunchingUrl();
     }
 }
