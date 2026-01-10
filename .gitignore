@@ -39,3 +39,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Android / TWA (Bubblewrap) build artifacts
+/.gradle/
+/local.properties
+/.idea/
+/app/build/
+/app/.cxx/
+# Do not commit packaged binaries
+/*.apk
+/*.aab
+/*.idsig
+# Keystore files (sensitive)
+*.keystore
+*.jks

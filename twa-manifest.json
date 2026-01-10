@@ -1,0 +1,60 @@
+{
+  "packageId": "com.onrender.tubecome.twa",
+  "host": "tubecome.onrender.com",
+  "name": "TubeCome - YouTube コメントビューア",
+  "launcherName": "TubeCome",
+  "display": "standalone",
+  "themeColor": "#3B82F6",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#F5F6F8",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://tubecome.onrender.com/icons/web-app-manifest-512x512.png",
+  "maskableIconUrl": "https://tubecome.onrender.com/icons/web-app-manifest-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "C:\\Users\\yuman\\source\\repos\\TubeCome\\android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "ホーム",
+      "shortName": "ホーム",
+      "url": "https://tubecome.onrender.com/",
+      "chosenIconUrl": "https://tubecome.onrender.com/icons/favicon-96x96.png"
+    },
+    {
+      "name": "ヘルプ",
+      "shortName": "ヘルプ",
+      "url": "https://tubecome.onrender.com/help",
+      "chosenIconUrl": "https://tubecome.onrender.com/icons/favicon-96x96.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://tubecome.onrender.com/site.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://tubecome.onrender.com/",
+  "minSdkVersion": 21,
+  "orientation": "portrait-primary",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "1"
+}
