@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { List, Button, Popconfirm, message, Badge } from 'antd';
 import { StarOutlined, StarFilled, DeleteOutlined, MenuOutlined, ReloadOutlined } from '@ant-design/icons';
 import Link from 'next/link';
@@ -137,7 +137,11 @@ export default function ChannelsHome() {
       </div>
 
       <div className="win-window win-inset p-4">
-        <div className="mb-4"><AddChannelForm /></div>
+        <div className="mb-4">
+          <Suspense fallback={null}>
+            <AddChannelForm />
+          </Suspense>
+        </div>
         {channels.length > 0 && (
           <div className="mb-2 text-xs text-gray-500">ドラッグして順番を並べ替えられます（ハンドルを掴んで移動）
           </div>
