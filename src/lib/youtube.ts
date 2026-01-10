@@ -65,9 +65,10 @@ export async function getAllCommentThreads(videoId: string, maxPages: number = 5
   const allItems: any[] = [];
   let pageToken: string | undefined = undefined;
   let pageCount = 0;
-
+  let hasMore = true;
+  
   try {
-    while (pageCount < maxPages) {
+    while (pageCount < maxPages && hasMore) {
       const response = await getCommentThreads({
         videoId,
         maxResults: 100,
@@ -85,11 +86,11 @@ export async function getAllCommentThreads(videoId: string, maxPages: number = 5
         pageToken = response.nextPageToken;
       } else {
         // No more pages
-        break;
+        hasMore = false;
       }
     }
 
-    return { items: allItems, totalFetched: allItems.length, pagesFetched: pageCount };
+    return { items: allItems, totalFetched: allItems.length, pagesFetched: pageCount, hasMore };
   } catch (error) {
     console.error('Error fetching all comment threads:', error);
     // Return what we've collected so far

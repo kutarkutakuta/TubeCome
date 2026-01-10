@@ -40,9 +40,8 @@ export default async function VideoPage({ params }: Props) {
     // For testing comment gaps: temporarily set to 1 page to simulate missing comments
     const MAX_COMMENT_PAGES = parseInt(process.env.MAX_COMMENT_PAGES || '5', 10);
     const commentsResp = await getAllCommentThreads(id, MAX_COMMENT_PAGES);
-
     // normalize threads into flat array: root then replies
-    const posts: Array<{ id: string; author: string; authorChannelId?: string; parentId?: string; text: string; publishedAt: string; likeCount?: number; dislikeCount?: number; isReply?: boolean; shortId?: string; isDeleted?: boolean }> = [];
+    const posts: Array<{ id: string; author: string; authorChannelId?: string; parentId?: string; text: string; publishedAt: string; likeCount?: number; dislikeCount?: number; isReply?: boolean; shortId?: string; isDeleted?: boolean; hasMore?: boolean }> = [];
 
     for (const thread of commentsResp.items || []) {
       const top = thread.snippet?.topLevelComment?.snippet;
@@ -51,7 +50,7 @@ export default async function VideoPage({ params }: Props) {
         const authorChannelId = top.authorChannelId?.value;
         const shortId = (authorChannelId || thread.id || '').toString().slice(0, 8);
         const isDeleted = !text || /removed|deleted|削除|This comment has been removed/i.test(text);
-        const topObj: any = { id: thread.id as string, author: top.authorDisplayName || '名無しさん', text: text, publishedAt: top.publishedAt || '', likeCount: typeof top.likeCount === 'number' ? top.likeCount : undefined, shortId, isDeleted };
+        const topObj: any = { id: thread.id as string, author: top.authorDisplayName, text: text, publishedAt: top.publishedAt || '', likeCount: typeof top.likeCount === 'number' ? top.likeCount : undefined, shortId, isDeleted };
         if (authorChannelId != null) topObj.authorChannelId = authorChannelId;
         posts.push(topObj as typeof posts[0]);
       }
@@ -63,7 +62,7 @@ export default async function VideoPage({ params }: Props) {
         const authorChannelIdSafe = (authorChannelId == null ? undefined : authorChannelId) as string | undefined;
         const shortId = (authorChannelIdSafe || r.id || '').toString().slice(0, 8);
         const isDeleted = !text || /removed|deleted|削除|This comment has been removed/i.test(text);
-        const replyObj: any = { id: r.id as string, author: rs?.authorDisplayName || '名無しさん', parentId: thread.id, text: text, publishedAt: rs?.publishedAt || '', likeCount: typeof rs?.likeCount === 'number' ? rs?.likeCount : undefined, isReply: true, shortId, isDeleted };
+        const replyObj: any = { id: r.id as string, author: rs?.authorDisplayName, parentId: thread.id, text: text, publishedAt: rs?.publishedAt || '', likeCount: typeof rs?.likeCount === 'number' ? rs?.likeCount : undefined, isReply: true, shortId, isDeleted };
         if (authorChannelIdSafe != null) replyObj.authorChannelId = authorChannelIdSafe;
         posts.push(replyObj as typeof posts[0]);
       }
@@ -75,6 +74,11 @@ export default async function VideoPage({ params }: Props) {
       const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
       return ta - tb;
     });
+
+    // Mark the first post with hasMore flag if there are more comments on API side
+    if (commentsResp.hasMore && posts.length > 0) {
+      posts[0].hasMore = true;
+    }
 
     return (
       <div className="p-4 max-w-3xl mx-auto">

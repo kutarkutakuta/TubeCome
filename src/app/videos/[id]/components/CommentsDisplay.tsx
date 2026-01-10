@@ -21,6 +21,7 @@ interface Comment {
   isReply?: boolean;
   shortId?: string;
   isDeleted?: boolean;
+  hasMore?: boolean;
 }
 
 export default function CommentsDisplay({
@@ -63,6 +64,8 @@ export default function CommentsDisplay({
   }
 
   useEffect(() => {
+
+    /** クライアントサイドでのコメントとサーバーコメントのマージ処理 */
     async function mergeComments() {
       try {
         const cachedComments = await getVideoComments(videoId);
@@ -70,6 +73,9 @@ export default function CommentsDisplay({
         let mergedComments: Comment[] = [];
         const commentMap = new Map<string, Comment>();
         const missing = new Set<string>();
+        
+        // Keep track of hasMore flag from server comments
+        const hasMoreIds = new Set(serverComments.filter(c => c.hasMore).map(c => c.id));
 
         if (cachedComments && cachedComments.length > 0) {
           const serverIds = new Set(serverComments.map(c => c.id));
@@ -93,6 +99,18 @@ export default function CommentsDisplay({
           const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
           return ta - tb;
         });
+
+        // Re-apply hasMore flag to the first comment (oldest) only if there are actual gaps
+        // If merged result has no missing comments, clear the hasMore flag
+        if (mergedComments.length > 0) {
+          if (missing.size > 0) {
+            // There are gaps, keep hasMore flag
+            mergedComments[0].hasMore = true;
+          } else {
+            // No gaps, clear hasMore flag
+            mergedComments[0].hasMore = false;
+          }
+        }
 
         await saveVideoComments(videoId, mergedComments);
 
@@ -190,17 +208,16 @@ export default function CommentsDisplay({
       {chrono.length === 0 && (
         <div className="win-window win-inset p-4">コメントが見つかりませんでした。</div>
       )}
-      {chrono.map((p) => {
+      {chrono.map((p, idx) => {
         const num = chronMap.get(p.id) || 0;
-        const isMissing = missingIds.has(p.id);
         const isViewed = viewedIds.has(p.id);
 
         if (p.isDeleted) {
           return (
             <div key={p.id}>
-              {isMissing && (
+              {p.hasMore && (
                 <div className="my-4 py-2 px-4 text-center text-xs font-bold bg-yellow-100 text-yellow-800 border-2 border-yellow-400 rounded">
-                  ⚠️ この付近のコメントが一部表示されていません
+                  ⚠️ コメントが多すぎるため省略されました。YouTubeで直接ご覧ください。
                 </div>
               )}
             </div>
@@ -249,6 +266,11 @@ export default function CommentsDisplay({
 
         return (
           <div key={p.id}>
+            {p.hasMore && (
+              <div className="my-4 py-2 px-4 text-center text-xs font-bold bg-yellow-100 text-yellow-800 border-2 border-yellow-400 rounded">
+                ⚠️ コメントが多すぎるため、一部のみ表示しています。さらに古いコメントを表示するには、YouTubeで直接ご覧ください。
+              </div>
+            )}
             <div id={`post-${num}`} data-comment-num={num} data-comment-id={p.id} className={`mb-6 break-words font-mono ${isViewed ? 'bg-gray-100' : ''}`}>
             <div className="mb-2 text-sm text-[var(--fg-secondary)] flex flex-wrap items-center">
               <span className="mr-2">{num} :</span>
@@ -278,11 +300,6 @@ export default function CommentsDisplay({
               {renderCommentText(p.text)}
             </div>
             </div>
-            {isMissing && (
-              <div className="my-4 py-2 px-4 text-center text-xs font-bold bg-yellow-100 text-yellow-800 border-2 border-yellow-400 rounded">
-                ⚠️ この付近のコメントが一部表示されていません
-              </div>
-            )}
           </div>
         );
       })}
