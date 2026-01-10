@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.onrender.tubecome.twa",
+      "sha256_cert_fingerprints": [
+        "54:32:EF:9C:25:68:FD:5D:7C:8F:E8:51:26:E0:D0:A8:62:9D:BA:E0:1F:C1:75:D4:02:8A:BC:93:48:12:85:F7"
+      ]
+    }
+  }
+]
