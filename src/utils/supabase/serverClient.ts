@@ -103,4 +103,25 @@ export async function getDailyQuotaTotalByIp(clientIp: string) {
   }
 }
 
+export async function getDailyQuotaTotalGlobal() {
+  if (!supabaseAdmin) return 0;
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data, error } = await (supabaseAdmin as any)
+      .from('youtube_quota_logs')
+      .select('units')
+      .eq('date', today);
+
+    if (error) {
+      console.error('Failed to read global quota total:', error);
+      return 0;
+    }
+
+    return (data || []).reduce((s: number, r: any) => s + (r?.units || 0), 0);
+  } catch (err) {
+    console.error('Failed to getDailyQuotaTotalGlobal:', err);
+    return 0;
+  }
+}
+
 export { supabaseAdmin };
