@@ -19,6 +19,7 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.content.Intent;
 
 
 
@@ -47,7 +48,20 @@ public class LauncherActivity
         // Get the original launch Url.
         Uri uri = super.getLaunchingUrl();
 
-        
+        Intent intent = getIntent();
+        if (intent != null) {
+            String action = intent.getAction();
+            if (Intent.ACTION_SEND.equals(action)) {
+                String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (sharedText != null && !sharedText.isEmpty()) {
+                    String base = getString(R.string.launchUrl);
+                    Uri target = Uri.parse(base).buildUpon()
+                            .appendQueryParameter("input", sharedText)
+                            .build();
+                    return target;
+                }
+            }
+        }
 
         return uri;
     }

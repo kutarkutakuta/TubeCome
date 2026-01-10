@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { addChannel as idbAddChannel } from '@/utils/indexeddb';
+import { useSearchParams } from 'next/navigation';
 
 export default function AddChannelForm() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
 
   async function onFinish(values: { input: string }) {
     setLoading(true);
@@ -36,6 +39,15 @@ export default function AddChannelForm() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    const param = searchParams.get('input');
+    if (param && !autoSubmitted) {
+      form.setFieldsValue({ input: param });
+      form.submit();
+      setAutoSubmitted(true);
+    }
+  }, [searchParams, autoSubmitted, form]);
 
   return (
     <Form form={form} onFinish={onFinish} layout="vertical">
