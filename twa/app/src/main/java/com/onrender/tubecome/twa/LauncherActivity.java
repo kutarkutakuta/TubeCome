@@ -19,6 +19,8 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.content.Intent;
+import android.content.SharedPreferences;
 
 
 
@@ -30,6 +32,17 @@ public class LauncherActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Handle ACTION_SEND before calling super.onCreate()
+        Intent intent = getIntent();
+        if (intent != null && Intent.ACTION_SEND.equals(intent.getAction())) {
+            String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+            if (sharedText != null && !sharedText.isEmpty()) {
+                // Store shared text in SharedPreferences for getLaunchingUrl() to retrieve
+                SharedPreferences prefs = getSharedPreferences("launch", MODE_PRIVATE);
+                prefs.edit().putString("input", sharedText).commit();
+            }
+        }
+        
         super.onCreate(savedInstanceState);
         // Setting an orientation crashes the app due to the transparent background on Android 8.0
         // Oreo and below. We only set the orientation on Oreo and above. This only affects the
@@ -47,7 +60,18 @@ public class LauncherActivity
         // Get the original launch Url.
         Uri uri = super.getLaunchingUrl();
 
-        
+        // Check if we stored an input parameter from ACTION_SEND
+        SharedPreferences prefs = getSharedPreferences("launch", MODE_PRIVATE);
+        String input = prefs.getString("input", null);
+        if (input != null && !input.isEmpty()) {
+            // Clear the stored input
+            prefs.edit().remove("input").commit();
+            // Append input parameter to the URI
+            Uri target = uri.buildUpon()
+                    .appendQueryParameter("input", input)
+                    .build();
+            return target;
+        }
 
         return uri;
     }
