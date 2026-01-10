@@ -21,33 +21,12 @@ export default function ChannelsHome() {
     async function load() {
       const ch = await getAllChannels();
       if (mounted) setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail, lastVisited: c.lastVisited })));
-      await resolveMissingTitles(ch);
       // Fetch new video counts for each channel
       fetchNewCounts(ch);
 
       // (quota usage moved to Help page)
     }
     load();
-    async function resolveMissingTitles(channels: Array<any>) {
-      const toResolve = channels.filter((d:any) => (!d.title || d.title === d.id) && /^UC[0-9A-Za-z_-]{20,}$/.test(d.id));
-      if (toResolve.length === 0) return;
-      for (const item of toResolve) {
-        try {
-          const res = await fetch('/api/resolve-channel', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ input: item.id }) });
-          if (res.ok) {
-            const json = await res.json();
-            const title = json.channelTitle;
-            if (title) {
-              await idbAddChannel(item.id, title);
-            }
-          }
-        } catch (e) {
-          // ignore
-        }
-      }
-      // reload after resolution
-      await load();
-    }
 
     function onChannels() { load(); }
     function onFavs() { if (mounted) setFavorites(getFavorites()); }

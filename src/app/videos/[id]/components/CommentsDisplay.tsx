@@ -181,12 +181,12 @@ export default function CommentsDisplay({
       <div className="win-window win-title-bar mb-2">
         コメント（{chrono.length.toLocaleString()}）
       </div>
-      <div className="mb-4 flex justify-between items-start">
+      {/* <div className="mb-4 flex justify-between items-start">
         <div className="text-xs text-gray-600 whitespace-pre-wrap">{debugInfo}</div>
         <button onClick={testGapDetection} className="win-btn text-xs px-3 py-1">
           🧪 抜け検出テスト
         </button>
-      </div>
+      </div> */}
       {chrono.length === 0 && (
         <div className="win-window win-inset p-4">コメントが見つかりませんでした。</div>
       )}

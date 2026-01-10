@@ -1,15 +1,30 @@
 import { NextResponse } from 'next/server';
 
-function extractChannelIdFromUrl(url: string) {
+async function fetchChannelTitleFromRss(channelId: string) {
   try {
-    const u = new URL(url);
-    const p = u.pathname;
-    const m = p.match(/\/channel\/(UC[0-9A-Za-z_-]{20,})/);
-    if (m) return m[1];
-    return null;
-  } catch (e) {
-    return null;
-  }
+    const rss = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`);
+    if (rss.ok) {
+      const txt = await rss.text();
+      const m = txt.match(/<title>([^<]+)<\/title>/);
+      const titleRaw = m ? m[1] : null;
+      try {
+        const { decodeHtml } = await import('@/utils/html');
+        const title = titleRaw ? decodeHtml(titleRaw) : null;
+        return title;
+      } catch (e) {
+        return titleRaw;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+function decodeHtmlEntities(str: string) {
+  return str.replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'");
 }
 
 export async function POST(req: Request) {
@@ -17,52 +32,18 @@ export async function POST(req: Request) {
   const input = (body.input || '').trim();
   if (!input) return NextResponse.json({ error: 'missing_input' }, { status: 400 });
 
-  // If it's already a channel id
+  // UCで始まるチャンネルIDが含まれる場合
   const idMatch = input.match(/^(UC[0-9A-Za-z_-]{20,})$/);
   if (idMatch) {
-    const ch = idMatch[1];
-    // try to fetch channel title via RSS
-    try {
-      const rss = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${ch}`);
-      if (rss.ok) {
-        const txt = await rss.text();
-        const m = txt.match(/<title>([^<]+)<\/title>/);
-        const titleRaw = m ? m[1] : null;
-        try {
-          const { decodeHtml } = await import('@/utils/html');
-          const title = titleRaw ? decodeHtml(titleRaw) : null;
-          return NextResponse.json({ channelId: ch, channelTitle: title });
-        } catch (e) {
-          return NextResponse.json({ channelId: ch, channelTitle: titleRaw });
-        }
-      }
-    } catch (e) {}
-    return NextResponse.json({ channelId: ch });
+    const channelId = idMatch[1];
+    const channelTitle = await fetchChannelTitleFromRss(channelId);
+    if (channelTitle) {
+      return NextResponse.json({ channelId, channelTitle });
+    }
+    return NextResponse.json({ channelId });
   }
 
-  // If URL contains /channel/ID
-  const fromUrl = extractChannelIdFromUrl(input);
-  if (fromUrl) {
-    const ch = fromUrl;
-    try {
-      const rss = await fetch(`https://www.youtube.com/feeds/videos.xml?channel_id=${ch}`);
-      if (rss.ok) {
-        const txt = await rss.text();
-        const m = txt.match(/<title>([^<]+)<\/title>/);
-        const titleRaw = m ? m[1] : null;
-        try {
-          const { decodeHtml } = await import('@/utils/html');
-          const title = titleRaw ? decodeHtml(titleRaw) : null;
-          return NextResponse.json({ channelId: ch, channelTitle: title });
-        } catch (e) {
-          return NextResponse.json({ channelId: ch, channelTitle: titleRaw });
-        }
-      }
-    } catch (e) {}
-    return NextResponse.json({ channelId: ch });
-  }
-
-  // If it's a Youtube URL, try fetch and extract channelId from HTML
+  // URLが与えられた場合はクローリング
   let targetUrl = input;
   if (!/^https?:\/\//.test(input)) {
     // Allow inputs like youtube.com/user/xxx
@@ -74,13 +55,28 @@ export async function POST(req: Request) {
     const res = await fetch(targetUrl, { redirect: 'follow' });
     if (!res.ok) return NextResponse.json({ error: 'fetch_failed', status: res.status }, { status: 502 });
     const text = await res.text();
-    // try to find "channelId":"UC..."
-    const m = text.match(/"channelId"\s*:\s*"(UC[0-9A-Za-z_-]{20,})"/);
-    if (m) return NextResponse.json({ channelId: m[1] });
 
-    // fallback: look for "externalId":"UC..."
-    const m2 = text.match(/"externalId"\s*:\s*"(UC[0-9A-Za-z_-]{20,})"/);
-    if (m2) return NextResponse.json({ channelId: m2[1] });
+    let channelId: string | null = null;
+    
+    // 正規表現でチャンネルID (UC...) を抽出
+    const regex = /"browseId":"(UC[a-zA-Z0-9_-]{22})"/;
+    const match = text.match(regex);
+    channelId = match ? match[1] : null;
+    
+    // 予備の抽出方法 (meta property="og:url")
+    if (!channelId) {
+      const ogUrlRegex = /<meta property="og:url" content="https:\/\/www\.youtube\.com\/channel\/(UC[a-zA-Z0-9_-]{22})">/;
+      const ogMatch = text.match(ogUrlRegex);
+      channelId = ogMatch ? ogMatch[1] : null;
+    }
+
+    if (channelId) {
+      const channelTitle = await fetchChannelTitleFromRss(channelId);
+      if (channelTitle) {
+        return NextResponse.json({ channelId, channelTitle });
+      }
+      return NextResponse.json({channelId});
+    }
 
     // If not found, return not found
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
