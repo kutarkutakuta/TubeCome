@@ -1,4 +1,4 @@
-﻿import type { Metadata } from 'next';
+﻿import type { Metadata, Viewport } from 'next';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import './globals.css';
 import Link from 'next/link';
@@ -11,18 +11,19 @@ export const metadata: Metadata = {
   description: '本アプリケーションはレトロ風インターフェイスで YouTube コメントを閲覧する軽量アプリです。',
   icons: '/icons/favicon.ico',
   manifest: '/site.webmanifest',
-  themeColor: '#3b82f6',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'TubeCome',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({
