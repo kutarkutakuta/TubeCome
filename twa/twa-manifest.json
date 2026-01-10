@@ -20,8 +20,8 @@
     "path": "C:\\Users\\yuman\\source\\repos\\TubeCome\\android.keystore",
     "alias": "android"
   },
-  "appVersionName": "4",
-  "appVersionCode": 5,
+  "appVersionName": "6",
+  "appVersionCode": 6,
   "shortcuts": [
     {
       "name": "ホーム",
@@ -56,5 +56,5 @@
   "fileHandlers": [],
   "launchHandlerClientMode": "",
   "displayOverride": [],
-  "appVersion": "4"
+  "appVersion": "6"
 }
