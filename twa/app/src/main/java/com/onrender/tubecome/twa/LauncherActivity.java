@@ -37,9 +37,15 @@ public class LauncherActivity
         if (intent != null && Intent.ACTION_SEND.equals(intent.getAction())) {
             String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
             if (sharedText != null && !sharedText.isEmpty()) {
-                // Store shared text in SharedPreferences for getLaunchingUrl() to retrieve
-                SharedPreferences prefs = getSharedPreferences("launch", MODE_PRIVATE);
-                prefs.edit().putString("input", sharedText).commit();
+                // Create new VIEW intent with proper URL
+                Uri targetUri = Uri.parse("https://tubecome.onrender.com/")
+                        .buildUpon()
+                        .appendQueryParameter("input", sharedText)
+                        .build();
+                Intent newIntent = new Intent(Intent.ACTION_VIEW, targetUri);
+                newIntent.setPackage(getPackageName());
+                newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                setIntent(newIntent);
             }
         }
         
@@ -57,20 +63,6 @@ public class LauncherActivity
 
     @Override
     protected Uri getLaunchingUrl() {
-        // Check if we stored an input parameter from ACTION_SEND
-        SharedPreferences prefs = getSharedPreferences("launch", MODE_PRIVATE);
-        String input = prefs.getString("input", null);
-        if (input != null && !input.isEmpty()) {
-            // Clear the stored input
-            prefs.edit().remove("input").commit();
-            // Build fixed URL with input parameter
-            Uri target = Uri.parse("https://tubecome.onrender.com/")
-                    .buildUpon()
-                    .appendQueryParameter("input", input)
-                    .build();
-            return target;
-        }
-
         // Normal launch - use default URL
         return super.getLaunchingUrl();
     }
