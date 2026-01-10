@@ -5,8 +5,10 @@ export async function GET(req: NextRequest) {
   const url = req.nextUrl.searchParams.get('url') || '';
   const input = url || text || '';
   
-  const target = new URL(req.nextUrl.origin);
-  target.pathname = '/';
+  // Use X-Forwarded-Host header for correct origin in production
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'tubecome.onrender.com';
+  const protocol = req.headers.get('x-forwarded-proto') || 'https';
+  const target = new URL(`${protocol}://${host}/`);
   if (input) target.searchParams.set('input', input);
 
   return NextResponse.redirect(target.toString(), 302);
@@ -33,8 +35,11 @@ export async function POST(req: NextRequest) {
   }
 
   const input = url || text || '';
-  const target = new URL(req.nextUrl.origin);
-  target.pathname = '/';
+  
+  // Use X-Forwarded-Host header for correct origin in production
+  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'tubecome.onrender.com';
+  const protocol = req.headers.get('x-forwarded-proto') || 'https';
+  const target = new URL(`${protocol}://${host}/`);
   if (input) target.searchParams.set('input', input);
 
   return NextResponse.redirect(target.toString(), 302);
