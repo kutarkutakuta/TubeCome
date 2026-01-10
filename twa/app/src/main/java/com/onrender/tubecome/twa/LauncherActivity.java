@@ -19,8 +19,6 @@ import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.content.Intent;
-import android.content.SharedPreferences;
 
 
 
@@ -46,14 +44,11 @@ public class LauncherActivity
 
     @Override
     protected Uri getLaunchingUrl() {
-        Intent intent = getIntent();
-        if (intent != null && Intent.ACTION_SEND.equals(intent.getAction())) {
-            String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-            if (sharedText != null && !sharedText.isEmpty()) {
-                // Redirect to PWA Web Share Target endpoint with proper URL encoding
-                return Uri.parse("https://tubecome.onrender.com/share?text=" + Uri.encode(sharedText));
-            }
-        }
-        return super.getLaunchingUrl();
+        // Get the original launch Url.
+        Uri uri = super.getLaunchingUrl();
+
+        
+
+        return uri;
     }
 }
