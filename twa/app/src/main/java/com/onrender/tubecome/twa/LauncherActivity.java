@@ -57,22 +57,21 @@ public class LauncherActivity
 
     @Override
     protected Uri getLaunchingUrl() {
-        // Get the original launch Url.
-        Uri uri = super.getLaunchingUrl();
-
         // Check if we stored an input parameter from ACTION_SEND
         SharedPreferences prefs = getSharedPreferences("launch", MODE_PRIVATE);
         String input = prefs.getString("input", null);
         if (input != null && !input.isEmpty()) {
             // Clear the stored input
             prefs.edit().remove("input").commit();
-            // Append input parameter to the URI
-            Uri target = uri.buildUpon()
+            // Build fixed URL with input parameter
+            Uri target = Uri.parse("https://tubecome.onrender.com/")
+                    .buildUpon()
                     .appendQueryParameter("input", input)
                     .build();
             return target;
         }
 
-        return uri;
+        // Normal launch - use default URL
+        return super.getLaunchingUrl();
     }
 }
