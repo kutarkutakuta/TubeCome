@@ -54,8 +54,9 @@ public class LauncherActivity
             if (Intent.ACTION_SEND.equals(action)) {
                 String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
                 if (sharedText != null && !sharedText.isEmpty()) {
-                    String base = getString(R.string.launchUrl);
-                    Uri target = Uri.parse(base).buildUpon()
+                    // Build proper URL from base URI with input parameter
+                    Uri target = uri.buildUpon()
+                            .clearQuery()
                             .appendQueryParameter("input", sharedText)
                             .build();
                     return target;
