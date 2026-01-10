@@ -10,6 +10,19 @@ export const metadata: Metadata = {
   title: 'TubeCome - YouTube コメントビューア',
   description: '本アプリケーションはレトロ風インターフェイスで YouTube コメントを閲覧する軽量アプリです。',
   icons: '/icons/favicon.ico',
+  manifest: '/site.webmanifest',
+  themeColor: '#3b82f6',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'TubeCome',
+  },
 };
 
 export default function RootLayout({
