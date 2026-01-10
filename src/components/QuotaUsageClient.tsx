@@ -65,8 +65,8 @@ export default function QuotaUsageClient() {
 
   return (
     <div className="text-sm">
-      {renderQuotaBar('API使用量（本日・全体）', globalTotal, globalErrorThreshold)}
-      {renderQuotaBar('API使用量（本日・あなた）', total, errorThreshold)}
+      {renderQuotaBar('本日のAPI使用量（全体）', globalTotal, globalErrorThreshold)}
+      {renderQuotaBar('本日のAPI使用量（あなた）', total, errorThreshold)}
     </div>
   );
 }

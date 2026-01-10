@@ -1,7 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 import QuotaUsageClient from '@/components/QuotaUsageClient';
-import { InfoCircleOutlined, QuestionCircleOutlined, LockOutlined, MailOutlined, BarChartOutlined } from '@ant-design/icons';
 
 export default function HelpPage() {
   return (
@@ -18,50 +17,69 @@ export default function HelpPage() {
       </div>
 
       <div className="space-y-4">
-        <div className="win-window win-inset p-4">
-          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本アプリケーションはレトロ風インターフェイスで YouTube コメントを閲覧する軽量アプリです。</p>
-        </div>
+        <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
+        <div className="text-lg font-bold">🎯 サービス概要</div>
+      </div>
+      <div className="win-window win-inset p-4">
+        <p className="text-sm text-[var(--fg-primary)] leading-relaxed">TubeComeは、レトロ風インターフェイスで YouTube コメントを閲覧できるアプリケーションです。</p>
+        <p className="text-sm text-[var(--fg-primary)] leading-relaxed">チャンネルを登録することで新着動画のコメントを効率的にチェックできます。</p>
+      </div> 
 
-        <div className="win-window win-title-bar mb-2 bg-slate-500 border-b border-slate-200 px-3 py-1 rounded-sm">
-          <div className="font-bold text-sm"><QuestionCircleOutlined className="mr-2 text-[var(--fg-secondary)] align-middle" />使い方</div>
-        </div>
+        <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
+          <div className="font-bold text-sm">💡 使い方</div>
+        </div> 
         <div className="win-window win-inset p-4">
           <ul className="list-disc list-inside text-sm space-y-2 text-[var(--fg-primary)]">
-            <li><strong>チャンネルの登録</strong>：<Link href="/" className="text-blue-600 underline">ホーム</Link> のページでチャンネルURLまたはチャンネルIDを追加します。</li>
-            <li><strong>お気に入り</strong>：チャンネル一覧で <strong>★</strong> をクリックしてお気に入りに追加できます。サイドバーはお気に入りのみ表示します。</li>
+            <li><strong>チャンネルの登録</strong>：<Link href="/" className="text-blue-600 underline">ホーム</Link> のページでYouTubeの「チャンネルURL」または「チャンネルID」を追加します。</li>
+            <li><strong>お気に入り</strong>：チャンネル一覧で <strong>★</strong> をクリックしてお気に入りに追加できます。</li>
             <li><strong>並び替え</strong>：チャンネル一覧でドラッグ＆ドロップして順序を変更できます（サイドバーにも反映されます）。</li>
-            <li><strong>動画ページ</strong>：チャンネルに紐づく動画を直近50個まで閲覧できます。</li>
+            <li><strong>動画ページ</strong>：チャンネルに紐づく新着動画を閲覧できます。</li>
+            <li><strong>コメントページ</strong>：動画の詳細情報と新着コメントを閲覧できます。</li>
           </ul>
+        </div> 
+
+        <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
+          <div className="font-bold text-sm">📉 利用制限</div>
+        </div>
+        <div className="win-window win-inset p-4">
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本アプリケーションで使用している YouTube Data API には日次の使用上限があるため、利用制限を行うことがあります。</p>
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">また、利用制限の都合上、古いコメントが一部欠落する可能性があります。</p>
+          <div className="mt-4">
+            <QuotaUsageClient />
+          </div>
         </div>
 
         <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
-          <div className="font-bold text-sm"><LockOutlined className="mr-2 text-[var(--fg-secondary)] align-middle" />プライバシーポリシー</div>
+          <div className="font-bold text-sm">🔧 技術スタック</div>
         </div>
         <div className="win-window win-inset p-4">
-          <p className="text-sm text-[var(--fg-primary)] leading-relaxed mb-3">本アプリケーションはアカウントや個人を識別する情報を収集しません。次に保存・送信される可能性のあるデータを示します。</p>
           <ul className="list-disc list-inside text-sm space-y-2 text-[var(--fg-primary)]">
-            <li><strong>ローカルストレージ</strong>：チャンネル登録情報（IndexedDB: <code className="bg-gray-100 px-1 py-0.5 rounded">tubecome_db</code> / store: <code className="bg-gray-100 px-1 py-0.5 rounded">channels</code>）、お気に入り（localStorage: <code className="bg-gray-100 px-1 py-0.5 rounded">tubecome-favorites</code>）、テーマ設定（localStorage: <code className="bg-gray-100 px-1 py-0.5 rounded">theme</code>）、クライアント側の一時的な動画リスト（sessionStorage: <code className="bg-gray-100 px-1 py-0.5 rounded">tubecome:video-list</code>）。</li>
-            <li><strong>Cookie</strong>：内部 API 用に HTTPOnly cookie <code className="bg-gray-100 px-1 py-0.5 rounded">tubecome_client_id</code> を利用することがあります（識別用途で、安全に扱います）。</li>
-            <li><strong>外部API</strong>：チャンネル解決や動画統計取得のために YouTube の RSS あるいは Invidious などの外部サービスに問い合わせる場合があります。</li>
-            <li><strong>第三者トラッキング</strong>：本アプリは分析ツールや広告のトラッキングを使用していません。</li>
-            <li><strong>データ削除</strong>：チャンネルは <Link href="/" className="text-blue-600 underline">ホーム</Link> のページで削除可能です。ローカルストレージ（ブラウザのサイトデータ）を消去すると全データが削除されます。</li>
+            <li>Next.js (App Router) / React / TypeScript</li>
+            <li>Tailwind CSS / Ant Design</li>
+            <li>Supabase (Postgres) で利用状況ログを管理</li>
+            <li>IndexedDB をクライアントキャッシュに利用</li>
+            <li>YouTube RSS / Invidious を利用したチャンネル解決</li>
           </ul>
-          <p className="text-sm text-[var(--fg-secondary)] mt-4">ご不明点やデータに関する要請（削除・エクスポートなど）がある場合は、管理者へお問い合わせください（連絡先は下記）。</p>
         </div>
 
         <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
-          <div className="font-bold text-sm"><BarChartOutlined className="mr-2 text-[var(--fg-secondary)] align-middle" />API使用量</div>
-        </div>
+          <div className="font-bold text-sm">📝 免責事項</div>
+        </div> 
         <div className="win-window win-inset p-4">
-          <QuotaUsageClient />
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本サービスは公式 YouTube とは一切関係ありません。</p>
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本サービスの利用によって生じたいかなる損害についても、運営者は責任を負いかねます。</p>
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">プライバシーポリシーの詳細は <a href="/privacy.html" className="text-blue-600 underline" target="_blank" rel="noreferrer">プライバシーポリシー</a> をご覧ください。</p>
         </div>
 
+
+
         <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
-          <div className="font-bold text-sm"><MailOutlined className="mr-2 text-[var(--fg-secondary)] align-middle" />お問い合わせ</div>
+          <div className="font-bold text-sm">📮 お問い合わせ</div>
         </div>
         <div className="win-window win-inset p-4">
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">ご意見・ご要望・不具合報告などは、以下の x.com アカウントまでお気軽にお寄せください</p>
           <a href="https://x.com/kutakutar_ff11" target="_blank" rel="noreferrer" className="text-blue-600 underline hover:brightness-75 transition-all text-sm">
-            https://x.com/kutakutar_ff11
+            @kutakutar_ff11
           </a>
         </div>
       </div>
