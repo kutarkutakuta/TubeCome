@@ -53,3 +53,11 @@ next-env.d.ts
 # Keystore files (sensitive)
 *.keystore
 *.jks
+
+# TWA subfolder build artifacts
+/twa/local.properties
+/twa/app/build/
+/twa/app/.cxx/
+/twa/*.apk
+/twa/*.aab
+/twa/*.idsig
