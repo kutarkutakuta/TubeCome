@@ -7,8 +7,8 @@ import MobileFooterNav from '@/components/MobileFooterNav';
 import { AppstoreOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons';
 
 export const metadata: Metadata = {
-  title: 'TubeCome - YouTube コメントビューア',
-  description: '本アプリケーションはレトロ風インターフェイスで YouTube コメントを閲覧する軽量アプリです。',
+  title: 'TubeCome - YouTubeコメントビューア',
+  description: 'TubeCome（ちゅーこめ）は、某大型掲示板風インターフェイスでYouTubeコメントを閲覧できる軽量アプリケーションです。YouTubeチャンネルを登録することで新着・未読コメントを効率的にチェックできます。',
   icons: '/icons/favicon.ico',
   manifest: '/site.webmanifest',
   appleWebApp: {

@@ -21,8 +21,8 @@ export default function HelpPage() {
         <div className="text-lg font-bold">🎯 サービス概要</div>
       </div>
       <div className="win-window win-inset p-4">
-        <p className="text-sm text-[var(--fg-primary)] leading-relaxed">TubeComeは、レトロ風インターフェイスで YouTube コメントを閲覧できるアプリケーションです。</p>
-        <p className="text-sm text-[var(--fg-primary)] leading-relaxed">チャンネルを登録することで新着動画のコメントを効率的にチェックできます。</p>
+        <p className="text-sm text-[var(--fg-primary)] leading-relaxed"><strong>TubeCome</strong>（ちゅーこめ）は、某大型掲示板風インターフェイスで YouTubeコメントを閲覧できる軽量アプリケーションです。</p>
+        <p className="text-sm text-[var(--fg-primary)] leading-relaxed">YouTubeチャンネルを登録することで新着・未読コメントを効率的にチェックできます。</p>
       </div> 
 
         <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
@@ -30,20 +30,33 @@ export default function HelpPage() {
         </div> 
         <div className="win-window win-inset p-4">
           <ul className="list-disc list-inside text-sm space-y-2 text-[var(--fg-primary)]">
-            <li><strong>チャンネルの登録</strong>：<Link href="/" className="text-blue-600 underline">ホーム</Link> のページでYouTubeの「チャンネルURL」または「チャンネルID」を追加します。</li>
+            <li><strong>チャンネルの登録</strong>：<Link href="/" className="text-blue-600 underline">ホーム</Link> のページでYouTubeの「チャンネルURL」または「チャンネルID」を追加します。
+            Androidの場合はYouTubeアプリの<strong>共有</strong>からチャンネル登録も可能です。</li>
+            <li><strong>チャンネル一覧</strong>：<Link href="/" className="text-blue-600 underline">ホーム</Link> のページに登録したチャンネルの一覧が表示されます。チャンネル内に新着動画があればバッジが表示されます。</li>
             <li><strong>お気に入り</strong>：チャンネル一覧で <strong>★</strong> をクリックしてお気に入りに追加できます。</li>
-            <li><strong>並び替え</strong>：チャンネル一覧でドラッグ＆ドロップして順序を変更できます（サイドバーにも反映されます）。</li>
-            <li><strong>動画ページ</strong>：チャンネルに紐づく新着動画を閲覧できます。</li>
-            <li><strong>コメントページ</strong>：動画の詳細情報と新着コメントを閲覧できます。</li>
+            <li><strong>並び替え</strong>：チャンネル一覧でドラッグ＆ドロップして順序を変更できます（お気に入りの順序にも反映されます）。</li>
+            <li><strong>動画一覧</strong>：チャンネルに紐づく動画を閲覧できます。新着・未読コメントがあればバッジが表示されます。</li>
+            <li><strong>コメント一覧</strong>：動画の詳細情報とコメントを閲覧できます。読んだコメントの位置を記憶して再訪問時に位置を復元します。</li>
           </ul>
         </div> 
+
+        {/* Android共有のやり方 */}
+        <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
+          <div className="font-bold text-sm">📲 AndroidでYouTubeから共有してチャンネル登録</div>
+        </div>
+        <div className="win-window win-inset p-4">
+          <ul className="list-disc list-inside text-sm space-y-2 text-[var(--fg-primary)]">
+            <li><strong>インストール</strong>：Chromeで本Webサイトを開いた状態で、メニュー（︙）→『ホーム画面に追加』を選択してAndroidアプリとしてインストールします。</li>
+            <li><strong>共有手順</strong>：YouTubeアプリでチャンネルページを開き、<strong>共有</strong>→共有先一覧から<strong>TubeCome</strong>を選択するとチャンネル登録ができます。</li>
+          </ul>
+        </div>
 
         <div className="win-window win-title-bar mb-2 bg-slate-100 border-b border-slate-200 px-3 py-1 rounded-sm">
           <div className="font-bold text-sm">📉 利用制限</div>
         </div>
         <div className="win-window win-inset p-4">
           <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本アプリケーションで使用している YouTube Data API には日次の使用上限があるため、利用制限を行うことがあります。</p>
-          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">また、利用制限の都合上、古いコメントが一部欠落する可能性があります。</p>
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">また、利用制限の都合上、古いコメントが一部欠落することがあります。</p>
           <div className="mt-4">
             <QuotaUsageClient />
           </div>
@@ -58,7 +71,7 @@ export default function HelpPage() {
             <li>Tailwind CSS / Ant Design</li>
             <li>Supabase (Postgres) で利用状況ログを管理</li>
             <li>IndexedDB をクライアントキャッシュに利用</li>
-            <li>YouTube RSS / Invidious を利用したチャンネル解決</li>
+            <li>YouTube Data API / YouTube RSS を利用したチャンネル解決</li>
           </ul>
         </div>
 

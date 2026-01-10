@@ -1,7 +1,7 @@
 {
-  "name": "TubeCome - YouTube コメントビューア",
+  "name": "TubeCome - YouTubeコメントビューア",
   "short_name": "TubeCome",
-  "description": "レトロ風インターフェイスで YouTube コメントを閲覧する軽量アプリ",
+  "description": "某大型掲示板風インターフェイスでYouTubeコメントを閲覧できる軽量アプリケーションです。",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
