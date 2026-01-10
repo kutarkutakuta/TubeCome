@@ -7,8 +7,9 @@ import MobileFooterNav from '@/components/MobileFooterNav';
 import { AppstoreOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons';
 
 export const metadata: Metadata = {
-  title: 'TubeCome 2000 - レトロ風 YouTube コメントビューア',
+  title: 'TubeCome - YouTube コメントビューア',
   description: '本アプリケーションはレトロ風インターフェイスで YouTube コメントを閲覧する軽量アプリです。',
+  icons: '/icons/favicon.ico',
 };
 
 export default function RootLayout({
