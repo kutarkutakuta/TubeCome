@@ -11,6 +11,7 @@ import { decodeHtml } from '@/utils/html';
 import { formatJaShortDateTime } from '@/utils/date';
 import { YoutubeOutlined } from '@ant-design/icons';
 import VideoStatsClient from '@/app/videos/[id]/components/VideoStatsClient';
+import QuotaLimitCheck from '@/components/QuotaLimitCheck';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -78,6 +79,7 @@ export default async function ChannelPage({ params }: Props) {
 
     return (
       <div className="p-4 max-w-3xl mx-auto">
+        <QuotaLimitCheck />
         <MarkChannelVisited channelId={id} />
         <div className="win-window win-title-bar mb-4">
         <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between">

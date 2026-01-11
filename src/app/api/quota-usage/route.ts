@@ -12,8 +12,8 @@ export async function GET(req: Request) {
 
     const total = await getDailyQuotaTotalByIp(clientIp);
     const globalTotal = await getDailyQuotaTotalGlobal();
-    const warnThreshold = parseInt(process.env.YT_QUOTA_WARN_PER_IP || '1000', 10);
-    const errorThreshold = parseInt(process.env.YT_QUOTA_ERROR_PER_IP || '5000', 10);
+    const warnThreshold = parseInt(process.env.YT_QUOTA_WARN_PER_IP || '100', 10);
+    const errorThreshold = parseInt(process.env.YT_QUOTA_ERROR_PER_IP || '200', 10);
     const globalErrorThreshold = parseInt(process.env.YT_QUOTA_ERROR_GLOBAL || '10000', 10);
 
     // log for debugging

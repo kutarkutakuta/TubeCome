@@ -15,6 +15,7 @@ import ScrollToTopClient from '@/app/videos/[id]/components/ScrollToTopClient';
 import ScrollToMarkerClient from '@/app/videos/[id]/components/ScrollToMarkerClient';
 import PrevNextClient from '@/app/videos/[id]/components/PrevNextClient';
 import VideoStatsClient from '@/app/videos/[id]/components/VideoStatsClient';
+import QuotaLimitCheck from '@/components/QuotaLimitCheck';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -83,6 +84,7 @@ export default async function VideoPage({ params }: Props) {
 
     return (
       <div className="p-4 max-w-3xl mx-auto">
+        <QuotaLimitCheck />
         <SaveVideoStats videoId={id} totalComments={details.statistics?.commentCount ?? 0} allCommentIds={posts.map(p => p.id)} />
         <LastViewedMarker videoId={id} allCommentIds={posts.map(p => p.id)} />
 
