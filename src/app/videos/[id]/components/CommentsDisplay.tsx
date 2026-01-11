@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { LikeOutlined, DislikeOutlined } from '@ant-design/icons';
-import { notification } from 'antd';
+import { LikeOutlined, DislikeOutlined, UndoOutlined } from '@ant-design/icons';
+import { Button, message, notification } from 'antd';
 import { linkify } from '@/utils/linkify';
 import AuthorPostsPreview from '@/app/videos/[id]/components/AuthorPostsPreview';
 import ReplyPreview from '@/app/videos/[id]/components/ReplyPreview';
 import CommentAuthor from '@/app/videos/[id]/components/CommentAuthor';
-import { getVideoComments, saveVideoComments, getViewedCommentIds } from '@/utils/indexeddb';
+import { getVideoComments, saveVideoComments, getViewedCommentIds, saveViewedCommentIds, saveMaxViewedIndex } from '@/utils/indexeddb';
 
 interface Comment {
   id: string;
@@ -199,8 +199,21 @@ export default function CommentsDisplay({
 
   return (
     <>
-      <div className="win-window win-title-bar mb-2">
-        コメント（{chrono.length.toLocaleString()}）
+      <div className="win-window p-2 mb-2 font-bold text-sm border-b border-slate-300">
+        <div className="flex items-center">
+          <div className="flex-1">コメント（{chrono.length.toLocaleString()}）</div>
+          <div className="ml-auto flex-none">
+            <Button size='small' type="dashed" icon={<UndoOutlined />} onClick={async () => {
+                try {
+                  await saveViewedCommentIds(videoId, []);
+                  await saveMaxViewedIndex(videoId, -1);
+                  message.success('既読の位置をリセットしました');
+                } catch (err) {
+                  console.error('Failed to reset viewed position:', err);
+                  message.error('既読の位置リセットに失敗しました');
+                }}}>既読リセット</Button>
+          </div>
+        </div>
       </div>
       {/* <div className="mb-4 flex justify-between items-start">
         <div className="text-xs text-gray-600 whitespace-pre-wrap">{debugInfo}</div>

@@ -35,6 +35,26 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
     }
     loadViewedIds();
 
+    // Update in-memory viewed IDs if another component changes them (e.g., reset button)
+    function onViewedChanged(e: any) {
+      if (!e?.detail?.videoId) return;
+      if (e.detail.videoId !== videoId) return;
+      (async () => {
+        try {
+          const ids = await getViewedCommentIds(videoId);
+          viewedIdsRef.current = new Set(ids || []);
+          // Cancel any pending save to avoid overwriting the cleared state
+          if (saveTimerRef.current) {
+            clearTimeout(saveTimerRef.current);
+            saveTimerRef.current = null;
+          }
+        } catch (err) {
+          console.error('Failed to refresh viewed IDs after change:', err);
+        }
+      })();
+    }
+    window.addEventListener('viewed-comments-changed', onViewedChanged as EventListener);
+
     // Save comment count if it has changed
     async function updateCommentCount() {
       try {
@@ -129,6 +149,9 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
       window.removeEventListener('touchstart', handleUserInteraction as EventListener);
       window.removeEventListener('keydown', handleUserInteraction as EventListener);
       window.removeEventListener('click', handleUserInteraction as EventListener);
+
+      // Remove viewed-changed listener
+      window.removeEventListener('viewed-comments-changed', onViewedChanged as EventListener);
 
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
