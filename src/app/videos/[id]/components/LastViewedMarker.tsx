@@ -63,6 +63,24 @@ export default function LastViewedMarker({ videoId, allCommentIds }: { videoId: 
         console.error('Failed to insert last viewed marker:', err);
       }
     })();
+
+    // Listen for viewed-comments-changed event (e.g., reset)
+    async function onViewedChanged(e: any) {
+      if (!e?.detail?.videoId) return;
+      if (e.detail.videoId !== videoId) return;
+      
+      // Check if viewed IDs are empty (reset)
+      const viewedIds = await getViewedCommentIds(videoId);
+      if (!viewedIds || viewedIds.length === 0) {
+        const marker = document.getElementById('last-viewed-marker');
+        if (marker) marker.remove();
+      }
+    }
+
+    window.addEventListener('viewed-comments-changed', onViewedChanged as EventListener);
+    return () => {
+      window.removeEventListener('viewed-comments-changed', onViewedChanged as EventListener);
+    };
   }, [videoId, allCommentIds]);
 
   return null;
