@@ -4,7 +4,7 @@ const STORE = 'channels';
 const VIDEO_STATS_STORE = 'videoStats';
 const VIDEO_COMMENTS_STORE = 'videoComments';
 // Bump version to ensure migrations run when the store name changed previously
-const VERSION = 4;
+const VERSION = 5;
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -26,6 +26,11 @@ function openDB(): Promise<IDBDatabase> {
       // Ensure videoComments store exists
       if (!db.objectStoreNames.contains(VIDEO_COMMENTS_STORE)) {
         db.createObjectStore(VIDEO_COMMENTS_STORE, { keyPath: 'videoId' });
+      }
+
+      // Ensure channelEntries store exists (stores parsed RSS entries per channel)
+      if (!db.objectStoreNames.contains('channelEntries')) {
+        db.createObjectStore('channelEntries', { keyPath: 'channelId' });
       }
 
       // If an older 'favorites' store exists, migrate its data into 'channels'
@@ -76,7 +81,7 @@ export async function getAllChannels(): Promise<Array<{id:string,title?:string,c
   });
 }
 
-export async function addChannel(id: string, title?: string) {
+export async function addChannel(id: string, title?: string, thumbnail?: string) {
   const db = await openDB();
   // Determine next order value (append to end)
   const existing = await getAllChannels();
@@ -86,7 +91,7 @@ export async function addChannel(id: string, title?: string) {
   return new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
     const store = tx.objectStore(STORE);
-    const payload = { id, title, createdAt: Date.now(), order } as any;
+    const payload = { id, title, thumbnail, createdAt: Date.now(), order } as any;
     const req = store.put(payload);
     req.onsuccess = () => {
       window.dispatchEvent(new CustomEvent('channels-changed'));
@@ -95,6 +100,26 @@ export async function addChannel(id: string, title?: string) {
     req.onerror = () => reject(req.error);
   });
 }
+
+// Update channel record (title/thumbnail etc.)
+export async function updateChannel(id: string, updates: Partial<{title:string,thumbnail:string,lastVisited:number}>) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    const getReq = store.get(id);
+    getReq.onsuccess = () => {
+      const rec = getReq.result || { id };
+      Object.assign(rec, updates);
+      store.put(rec);
+    };
+    tx.oncomplete = () => {
+      window.dispatchEvent(new CustomEvent('channels-changed'));
+      resolve();
+    };
+    tx.onerror = () => reject(tx.error);
+  });
+} 
 
 export async function removeChannel(id: string) {
   const db = await openDB();
@@ -142,6 +167,19 @@ export async function isChannelRegistered(id: string): Promise<boolean> {
     const store = tx.objectStore(STORE);
     const req = store.get(id);
     req.onsuccess = () => resolve(!!req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Get a single channel by id
+export async function getChannel(id: string): Promise<{id:string,title?:string,createdAt?:number,order?:number,thumbnail?:string,lastVisited?:number} | null> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains(STORE)) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const store = tx.objectStore(STORE);
+    const req = store.get(id);
+    req.onsuccess = () => resolve(req.result ?? null);
     req.onerror = () => reject(req.error);
   });
 }
@@ -194,6 +232,35 @@ export async function resetAllLastVisitedForTest() {
       resolve();
     };
     tx.onerror = () => reject(tx.error);
+  });
+}
+
+// Save parsed channel entries (RSS) into channelEntries store
+export async function saveChannelEntries(channelId: string, entries: any[]) {
+  const db = await openDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction('channelEntries', 'readwrite');
+    const store = tx.objectStore('channelEntries');
+    const payload = { channelId, entries, lastUpdated: Date.now() } as any;
+    const req = store.put(payload);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Get parsed channel entries from channelEntries store
+export async function getChannelEntries(channelId: string): Promise<Array<any> | null> {
+  const db = await openDB();
+  if (!db.objectStoreNames.contains('channelEntries')) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('channelEntries', 'readonly');
+    const store = tx.objectStore('channelEntries');
+    const req = store.get(channelId);
+    req.onsuccess = () => {
+      const result = req.result;
+      resolve(result ? result.entries || [] : null);
+    };
+    req.onerror = () => reject(req.error);
   });
 }
 
