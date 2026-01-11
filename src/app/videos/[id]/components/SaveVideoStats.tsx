@@ -134,7 +134,10 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
           }
         });
       },
-      { threshold: 0.5 } // 50% visible to count
+      { 
+        threshold: 1.0, // 100% visible to count as viewed
+        rootMargin: '0px 0px -100px 0px' // Require comment to be 100px above bottom of viewport
+      }
     );
 
     // Observe all comment elements
