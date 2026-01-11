@@ -5,8 +5,27 @@ import { saveViewedCommentIds, getPreviousCommentCount, saveVideoCommentCount, g
 export default function SaveVideoStats({ videoId, totalComments, allCommentIds }: { videoId: string; totalComments: number; allCommentIds: string[] }) {
   const viewedIdsRef = useRef(new Set<string>());
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Do not mark as viewed until the user explicitly interacts (scroll/wheel/touch/keydown/click)
+  const userInteractedRef = useRef(false);
 
   useEffect(() => {
+    // Mark that the user interacted (scrolling, wheel, touch, keydown, or click)
+    function handleUserInteraction(e?: Event) {
+      if (!userInteractedRef.current) userInteractedRef.current = true;
+    }
+
+    function checkScrollForMovement() {
+      if (window.scrollY && window.scrollY > 10) {
+        handleUserInteraction();
+      }
+    }
+
+    window.addEventListener('scroll', checkScrollForMovement, { passive: true });
+    window.addEventListener('wheel', handleUserInteraction, { passive: true });
+    window.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    window.addEventListener('keydown', handleUserInteraction);
+    window.addEventListener('click', handleUserInteraction);
+
     // Load previously viewed comment IDs
     async function loadViewedIds() {
       const ids = await getViewedCommentIds(videoId);
@@ -36,6 +55,9 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          // Only mark as viewed if user has interacted (scrolled/wheel/touch/keydown/click)
+          if (!userInteractedRef.current) return;
+
           if (entry.isIntersecting) {
             const commentId = entry.target.getAttribute('data-comment-id');
 
@@ -101,6 +123,13 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
 
     return () => {
       observer.disconnect();
+      // Remove interaction listeners
+      window.removeEventListener('scroll', checkScrollForMovement as EventListener);
+      window.removeEventListener('wheel', handleUserInteraction as EventListener);
+      window.removeEventListener('touchstart', handleUserInteraction as EventListener);
+      window.removeEventListener('keydown', handleUserInteraction as EventListener);
+      window.removeEventListener('click', handleUserInteraction as EventListener);
+
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
         // Save final state on unmount
