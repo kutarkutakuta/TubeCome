@@ -100,15 +100,18 @@ export default function CommentsDisplay({
           return ta - tb;
         });
 
-        // Re-apply hasMore flag to the first comment (oldest) only if there are actual gaps
-        // If merged result has no missing comments, clear the hasMore flag
+        // Re-apply hasMore flag to the first comment (oldest).
+        // Preserve server-indicated hasMore unless we can confirm cached comments include older items that fill the gap.
         if (mergedComments.length > 0) {
-          if (missing.size > 0) {
-            // There are gaps, keep hasMore flag
-            mergedComments[0].hasMore = true;
+          const serverHasMore = serverComments.some(c => c.hasMore);
+          if (serverHasMore) {
+            const earliestServerTs = Math.min(...serverComments.map(c => new Date(c.publishedAt).getTime()));
+            const hasCachedEarlier = !!(cachedComments && cachedComments.some(c => new Date(c.publishedAt).getTime() < earliestServerTs));
+            // If we have cached comments older than the earliest server comment, we can clear hasMore
+            mergedComments[0].hasMore = !hasCachedEarlier;
           } else {
-            // No gaps, clear hasMore flag
-            mergedComments[0].hasMore = false;
+            // Fall back to missing-id heuristic
+            mergedComments[0].hasMore = missing.size > 0;
           }
         }
 
