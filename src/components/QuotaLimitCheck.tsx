@@ -17,8 +17,7 @@ export default function QuotaLimitCheck() {
         if (!res.ok) return;
         
         const data = await res.json();
-        const { total = 0 } = data;
-        const errorThreshold = parseInt(process.env.YT_QUOTA_ERROR_PER_IP || '200', 10);
+        const { total = 0, errorThreshold = 200 } = data;
 
         // Check if any threshold exceeded
         let message = '';
