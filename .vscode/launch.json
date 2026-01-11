@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Next.js: Dev + Browser",
+      "name": "Next.js: Server",
       "type": "pwa-node",
       "request": "launch",
       "runtimeExecutable": "node",
@@ -15,11 +15,22 @@
       "console": "integratedTerminal",
       "autoAttachChildProcesses": false,
       "skipFiles": ["<node_internals>/**"],
-      "serverReadyAction": {
-        "action": "openExternally",
-        "pattern": "Local:\\s+(https?://localhost:3000)"
-      },
       "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Next.js: Client (Chrome)",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Next.js: Full Stack",
+      "configurations": ["Next.js: Server", "Next.js: Client (Chrome)"]
     }
   ]
 }
