@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { List, Button, Badge } from 'antd';
+import { Button, Badge } from 'antd';
 import { StarFilled } from '@ant-design/icons';
 import { getAllChannels } from '@/utils/indexeddb';
 import { getFavorites, removeFavorite } from '@/utils/favorites';
@@ -68,13 +68,14 @@ export default function ChannelsList({ onSelect }: { onSelect?: () => void }) {
 
   return (
     <div className="w-full">
-      <List
-        dataSource={favoriteChannels}
-        renderItem={(ch) => (
-          <List.Item>
-            <div className="flex items-center w-full">
+      {favoriteChannels.length === 0 ? (
+        <div className="text-xs text-gray-500">お気に入りに登録したチャンネルがここに表示されます。</div>
+      ) : (
+        <ul className="divide-y divide-[rgba(0,0,0,0.06)]">
+          {favoriteChannels.map(ch => (
+            <li key={ch.id} className="flex items-center w-full py-2">
               <Button
-                key="fav"
+                key={"fav-" + ch.id}
                 size="small"
                 type="text"
                 className="mr-2 p-0"
@@ -89,11 +90,10 @@ export default function ChannelsList({ onSelect }: { onSelect?: () => void }) {
                   <Badge count={newCounts[ch.id]} showZero={false} color="#ff85c1" />
                 )}
               </div>
-            </div>
-          </List.Item>
-        )}
-        locale={{ emptyText: 'お気に入りに登録したチャンネルがここに表示されます。' }}
-      />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

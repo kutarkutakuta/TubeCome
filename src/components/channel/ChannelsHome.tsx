@@ -177,7 +177,7 @@ export default function ChannelsHome() {
                 />
 
                 <div className="flex-1 min-w-0 flex items-center gap-2">
-                  <Link href={`/channel/${encodeURIComponent(ch.id)}`} className="flex-1 whitespace-normal break-words">{ch.title || ch.id}</Link>
+                  <Link href={`/channel/${encodeURIComponent(ch.id)}`} className="flex-1 font-bold break-words">{ch.title || ch.id}</Link>
                   {newCounts[ch.id] > 0 && (
                     <Badge count={newCounts[ch.id]} showZero={false} color="#ff85c1" />
                   )}
