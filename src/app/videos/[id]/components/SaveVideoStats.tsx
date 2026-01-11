@@ -35,6 +35,48 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
     }
     loadViewedIds();
 
+    // Check if page has scrollbar and auto-enable viewed tracking if not
+    async function checkScrollbarAndInit() {
+      // Wait for DOM to settle
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+      // If no scrollbar or scrollable height is very small (less than 200px), auto-enable viewed tracking
+      if (scrollableHeight < 200) {
+        userInteractedRef.current = true;
+        
+        // Manually trigger viewed marking for all currently visible comments
+        const commentElements = document.querySelectorAll('[data-comment-id]');
+        commentElements.forEach(el => {
+          const rect = el.getBoundingClientRect();
+          const isFullyVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+          
+          if (isFullyVisible) {
+            const commentId = el.getAttribute('data-comment-id');
+            if (commentId && !viewedIdsRef.current.has(commentId)) {
+              viewedIdsRef.current.add(commentId);
+            }
+          }
+        });
+        
+        // Save the viewed IDs
+        if (viewedIdsRef.current.size > 0) {
+          const viewedIds = Array.from(viewedIdsRef.current);
+          await saveViewedCommentIds(videoId, viewedIds);
+          
+          let maxIndex = -1;
+          for (const id of viewedIds) {
+            const idx = allCommentIds.indexOf(id);
+            if (idx > maxIndex) maxIndex = idx;
+          }
+          if (maxIndex >= 0) {
+            await saveMaxViewedIndex(videoId, maxIndex);
+          }
+        }
+      }
+    }
+    checkScrollbarAndInit();
+
     // Update in-memory viewed IDs if another component changes them (e.g., reset button)
     function onViewedChanged(e: any) {
       if (!e?.detail?.videoId) return;
@@ -76,6 +118,7 @@ export default function SaveVideoStats({ videoId, totalComments, allCommentIds }
       (entries) => {
         entries.forEach((entry) => {
           // Only mark as viewed if user has interacted (scrolled/wheel/touch/keydown/click)
+          // or if there's no scrollbar (handled by setTimeout check above)
           if (!userInteractedRef.current) return;
 
           if (entry.isIntersecting) {
