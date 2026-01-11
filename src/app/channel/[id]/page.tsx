@@ -112,10 +112,10 @@ export default async function ChannelPage({ params }: Props) {
                     )}
                   </div>
                   <div className="text-sm text-[var(--fg-secondary)] mt-1 flex items-center gap-0">
-                    <div className="min-w-0">{formatJaShortDateTime(v.published)}</div>
-                    <div className="ml-auto">
+                    公開日時：<div className="min-w-0">{formatJaShortDateTime(v.published)}</div>
+                  </div>
+                  <div className="mt-1">
                       <VideoStatsClient statistics={s ?? undefined} />
-                    </div>
                   </div>
                   {/* {v.description && (
                     <div className="text-sm mt-2 text-[var(--fg-secondary)]">{v.description.length > 100 ? `${v.description.slice(0, 100)}…` : v.description}</div>

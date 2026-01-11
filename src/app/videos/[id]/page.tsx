@@ -100,7 +100,7 @@ export default async function VideoPage({ params }: Props) {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-base sm:text-lg font-bold break-words" title={decodeHtml(details.title)}>{decodeHtml(details.title)}</div>
-              <div className="text-sm mt-1 text-[var(--fg-secondary)]">{details.channelTitle}・{formatJaShortDateTime(details.publishedAt)}</div>
+              <div className="text-sm mt-1 text-[var(--fg-secondary)]">{details.channelTitle}（{formatJaShortDateTime(details.publishedAt)}）</div>
               {/* Desktop: keep stats here but hide on small screens */}
               <div className="mt-2 hidden sm:block">
                 <VideoStatsClient statistics={details.statistics} />
