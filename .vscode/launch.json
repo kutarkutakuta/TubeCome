@@ -1,41 +1,25 @@
 {
-  // Debug configurations for Next.js (Node attach + Chrome) and a fullstack compound
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Next Dev (inspect:9230)",
+      "name": "Next.js: Dev + Browser",
       "type": "pwa-node",
       "request": "launch",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["--inspect=9230", "${workspaceFolder}/node_modules/next/dist/bin/next", "dev"],
-      "console": "integratedTerminal",
+      "runtimeArgs": [
+        "--inspect=9231",
+        "${workspaceFolder}/node_modules/next/dist/bin/next",
+        "dev"
+      ],
       "cwd": "${workspaceFolder}",
-      "autoAttachChildProcesses": false
-    },
-    {
-      "name": "Attach to Next (Node 9230)",
-      "type": "pwa-node",
-      "request": "attach",
-      "port": 9230,
-      "restart": true,
-      "skipFiles": ["<node_internals>/**"]
-    },
-    {
-      "name": "Launch Chrome against localhost",
-      "type": "pwa-chrome",
-      "request": "launch",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}"
-    }
-  ],
-  "compounds": [
-    {
-      "name": "Debug Fullstack",
-      "configurations": [
-        "Launch Next Dev (with inspect)",
-        "Attach to Next (Node)",
-        "Launch Chrome against localhost"
-      ]
+      "console": "integratedTerminal",
+      "autoAttachChildProcesses": false,
+      "skipFiles": ["<node_internals>/**"],
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "Local:\\s+(https?://localhost:3000)"
+      },
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }
