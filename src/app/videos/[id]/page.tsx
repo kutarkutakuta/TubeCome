@@ -14,6 +14,7 @@ import ScrollToBottomClient from '@/app/videos/[id]/components/ScrollToBottomCli
 import ScrollToTopClient from '@/app/videos/[id]/components/ScrollToTopClient';
 import ScrollToMarkerClient from '@/app/videos/[id]/components/ScrollToMarkerClient';
 import PrevNextClient from '@/app/videos/[id]/components/PrevNextClient';
+import VideoStatsClient from '@/app/videos/[id]/components/VideoStatsClient';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -99,17 +100,19 @@ export default async function VideoPage({ params }: Props) {
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-base sm:text-lg font-bold break-words" title={decodeHtml(details.title)}>{decodeHtml(details.title)}</div>
-              <div className="text-sm text-[var(--fg-secondary)]">{details.channelTitle} • {formatJaShortDateTime(details.publishedAt)}</div>
-              <div className="mt-2 text-sm text-[var(--fg-secondary)]">
-                再生数: {details.statistics?.viewCount?.toLocaleString() ?? '—'}
-                {details.statistics?.likeCount ? ` • 高評価: ${details.statistics.likeCount.toLocaleString()}` : ''}
-                {details.statistics?.commentCount ? ` • コメント数: ${details.statistics.commentCount.toLocaleString()}` : ''}
-
+              <div className="text-sm mt-1 text-[var(--fg-secondary)]">{details.channelTitle}・{formatJaShortDateTime(details.publishedAt)}</div>
+              {/* Desktop: keep stats here but hide on small screens */}
+              <div className="mt-2 hidden sm:block">
+                <VideoStatsClient statistics={details.statistics} />
               </div>
             </div>
           </div>
 
           <div className="mt-4 text-sm break-words">
+            {/* Mobile: show stats above description */}
+            <div className="mt-1 mb-2 block sm:hidden">
+              <VideoStatsClient statistics={details.statistics} />
+            </div>
             {details.description ? (
               details.description.length > 300 ? (
                 <>

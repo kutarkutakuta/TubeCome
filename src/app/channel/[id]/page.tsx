@@ -10,6 +10,7 @@ import CaptureVideoListClient from '@/app/channel/[id]/components/CaptureVideoLi
 import { decodeHtml } from '@/utils/html';
 import { formatJaShortDateTime } from '@/utils/date';
 import { YoutubeOutlined } from '@ant-design/icons';
+import VideoStatsClient from '@/app/videos/[id]/components/VideoStatsClient';
 
 type Props = {
   params: { id: string } | Promise<{ id: string }>;
@@ -110,11 +111,11 @@ export default async function ChannelPage({ params }: Props) {
                       <div className="text-[10px] bg-[var(--bg-panel)] px-1 rounded text-[var(--fg-secondary)]">{formatDuration(v.durationSeconds)}</div>
                     )}
                   </div>
-                  <div className="text-sm text-[var(--fg-secondary)] mt-1">
-                    {formatJaShortDateTime(v.published)}
-                    {s && ` • 再生数: ${s.viewCount?.toLocaleString() ?? '—'}`}
-                    {s && s.likeCount ? ` • 高評価: ${s.likeCount.toLocaleString()}` : ''}
-                    {s && s.commentCount ? ` • コメント数: ${s.commentCount.toLocaleString()}` : ''}
+                  <div className="text-sm text-[var(--fg-secondary)] mt-1 flex items-center gap-0">
+                    <div className="min-w-0">{formatJaShortDateTime(v.published)}</div>
+                    <div className="ml-auto">
+                      <VideoStatsClient statistics={s ?? undefined} />
+                    </div>
                   </div>
                   {/* {v.description && (
                     <div className="text-sm mt-2 text-[var(--fg-secondary)]">{v.description.length > 100 ? `${v.description.slice(0, 100)}…` : v.description}</div>

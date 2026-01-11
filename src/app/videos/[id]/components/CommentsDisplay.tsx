@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { LikeOutlined, DislikeOutlined, UndoOutlined } from '@ant-design/icons';
-import { Button, message, notification } from 'antd';
+import { Button, message, notification, Tag } from 'antd';
 import { linkify } from '@/utils/linkify';
 import AuthorPostsPreview from '@/app/videos/[id]/components/AuthorPostsPreview';
 import ReplyPreview from '@/app/videos/[id]/components/ReplyPreview';
@@ -298,12 +298,12 @@ export default function CommentsDisplay({
               </CommentAuthor>
 
               <span className="mx-2">: {formatDate(p.publishedAt)}</span>
-              <span className="ml-2 vote-badges">
+              <span className="ml-2">
                 {typeof p.likeCount === 'number' && p.likeCount > 0 ? (
-                  <span className="vote-badge like"><LikeOutlined className="anticon" /><span className="vote-count">{p.likeCount.toLocaleString()}</span></span>
+                  <Tag variant="outlined" icon={<LikeOutlined />} color="success">{p.likeCount.toLocaleString()}</Tag>
                 ) : null}
                 {typeof p.dislikeCount === 'number' && p.dislikeCount > 0 ? (
-                  <span className="vote-badge dislike"><DislikeOutlined className="anticon" /><span className="vote-count">{p.dislikeCount.toLocaleString()}</span></span>
+                  <Tag variant="outlined" icon={<DislikeOutlined />} color="geekblue">{p.dislikeCount.toLocaleString()}</Tag>
                 ) : null}
               </span>
             </div>

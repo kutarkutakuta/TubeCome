@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { FloatButton } from 'antd';
-import { EyeOutlined } from '@ant-design/icons';
+import { AimOutlined, BookOutlined, EnvironmentOutlined, EyeOutlined, HighlightOutlined, LineOutlined, VerticalAlignMiddleOutlined } from '@ant-design/icons';
 
 export default function ScrollToMarkerClient() {
   const [visible, setVisible] = useState(false);
@@ -31,7 +31,7 @@ export default function ScrollToMarkerClient() {
   return (
     <FloatButton
       type="default"
-      icon={<EyeOutlined />}
+      icon={<BookOutlined />}
       onClick={scrollToMarker}
       style={{ right: 30, bottom: 200, display: visible ? 'inline-flex' : 'none', zIndex: 1000 }}
     />

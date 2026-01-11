@@ -271,35 +271,4 @@ a:hover {
   margin-right: 6px;
 }
 
-/* Vote badges */
-.vote-badges {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-}
-.vote-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 12px;
-}
-.vote-badge.like {
-  background: #f0fdf4;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-}
-.vote-badge.dislike {
-  background: #fff1f2;
-  color: #9f1239;
-  border: 1px solid #fecaca;
-}
-.vote-badge .anticon {
-  font-size: 12px;
-}
-.vote-count {
-  font-variant-numeric: tabular-nums;
-}
 
