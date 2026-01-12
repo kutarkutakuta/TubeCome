@@ -44,7 +44,7 @@ export default function HelpPage() {
           <ul className="list-disc list-inside text-sm space-y-2 text-[var(--fg-primary)]">
             <li><strong>Android</strong>：
               <ol className="list-inside ml-4 mt-1 space-y-1">
-                <li>Chromeで本Webサイトを開き、メニュー（︙）→『ホーム画面に追加』を選択してインストールします。</li>
+                <li>Google Play Store から <a href="https://play.google.com/store/apps/details?id=com.onrender.tubecome.twa" target="_blank" rel="noreferrer">TubeCome</a> をインストールします。</li>
                 <li>YouTubeアプリでチャンネルページを開き、<strong>共有</strong>の共有先一覧から<strong>TubeCome</strong>を選択するとチャンネル登録ができます。</li>
               </ol>
             </li>
