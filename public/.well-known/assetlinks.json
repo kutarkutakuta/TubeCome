@@ -1,11 +1,15 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.onrender.tubecome.twa",
       "sha256_cert_fingerprints": [
-        "54:32:EF:9C:25:68:FD:5D:7C:8F:E8:51:26:E0:D0:A8:62:9D:BA:E0:1F:C1:75:D4:02:8A:BC:93:48:12:85:F7"
+        "54:32:EF:9C:25:68:FD:5D:7C:8F:E8:51:26:E0:D0:A8:62:9D:BA:E0:1F:C1:75:D4:02:8A:BC:93:48:12:85:F7",
+        "6A:85:78:36:C8:7F:FB:3C:AF:DA:37:06:2A:CA:2E:66:95:BA:77:1F:0E:8F:E0:DF:6D:00:E1:11:7A:07:42:FB"
       ]
     }
   }

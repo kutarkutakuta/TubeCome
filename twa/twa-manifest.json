@@ -49,7 +49,12 @@
   "fullScopeUrl": "https://tubecome.onrender.com/",
   "minSdkVersion": 21,
   "orientation": "portrait-primary",
-  "fingerprints": [],
+  "fingerprints": [
+    {
+      "type": "sha256_cert",
+      "value": "54:32:EF:9C:25:68:FD:5D:7C:8F:E8:51:26:E0:D0:A8:62:9D:BA:E0:1F:C1:75:D4:02:8A:BC:93:48:12:85:F7"
+    }
+  ],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "protocolHandlers": [],
