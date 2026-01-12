@@ -199,7 +199,6 @@ export default function ChannelsHome() {
         />
       </div>
 
-      <div className="h-20" />
     </div>
   );
 }
