@@ -86,7 +86,7 @@ export default function HelpPage() {
         <div className="win-window win-inset p-4">
           <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本サービスは公式 YouTube とは一切関係ありません。</p>
           <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本サービスの利用によって生じたいかなる損害についても、運営者は責任を負いかねます。</p>
-          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">プライバシーポリシーの詳細は <a href="/privacy.html" className="text-blue-600 underline" target="_blank" rel="noreferrer">プライバシーポリシー</a> をご覧ください。</p>
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">プライバシーポリシーの詳細は <Link href="/privacy.html" className="text-blue-600 underline">プライバシーポリシー</Link> をご覧ください。</p>
         </div>
 
 
