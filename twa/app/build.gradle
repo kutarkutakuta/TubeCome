@@ -24,8 +24,8 @@ def twaManifest = [
     applicationId: 'com.onrender.tubecome.twa',
     hostName: 'tubecome.onrender.com', // The domain being opened in the TWA.
     launchUrl: '/', // The start path for the TWA. Must be relative to the domain.
-    name: 'TubeCome - YouTube コメントビューア', // The application name.
-    launcherName: 'TubeCome', // The name shown on the Android Launcher.
+    name: 'ちゅーこめ - YouTube コメントビューア', // The application name.
+    launcherName: 'ちゅーこめ', // The name shown on the Android Launcher.
     themeColor: '#3B82F6', // The color used for the status bar.
     themeColorDark: '#000000', // The color used for the dark status bar.
     navigationColor: '#000000', // The color used for the navigation bar.

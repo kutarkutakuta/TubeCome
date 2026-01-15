@@ -10,7 +10,7 @@ import { getFavorites, addFavorite, removeFavorite } from '@/utils/favorites';
 import { countNewVideos } from '@/utils/rss';
 
 export default function ChannelsHome() {
-  const [channels, setChannels] = useState<Array<{id:string,title?:string,lastVisited?:number}>>([]);
+  const [channels, setChannels] = useState<Array<{ id: string, title?: string, lastVisited?: number }>>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export default function ChannelsHome() {
     let mounted = true;
     async function load() {
       const ch = await getAllChannels();
-      if (mounted) setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail, lastVisited: c.lastVisited })));
+      if (mounted) setChannels(ch.map((c: any) => ({ id: c.id, title: c.title, thumbnail: c.thumbnail, lastVisited: c.lastVisited })));
       // Fetch new video counts for each channel
       fetchNewCounts(ch);
 
@@ -50,7 +50,7 @@ export default function ChannelsHome() {
   // drag handlers
   function onDragStart(e: React.DragEvent, id: string) {
     setDraggingId(id);
-    try { e.dataTransfer.setData('text/plain', id); } catch (e) {}
+    try { e.dataTransfer.setData('text/plain', id); } catch (e) { }
   }
 
   function onDragOver(e: React.DragEvent, id: string) {
@@ -78,7 +78,7 @@ export default function ChannelsHome() {
     setChannels(items);
 
     // persist order
-    await import('@/utils/indexeddb').then(m => m.setChannelsOrder(items.map((c)=>c.id)));
+    await import('@/utils/indexeddb').then(m => m.setChannelsOrder(items.map((c) => c.id)));
 
     setDraggingId(null);
     setDragOverId(null);
@@ -94,7 +94,7 @@ export default function ChannelsHome() {
     }
 
     const ch = await getAllChannels();
-    setChannels(ch.map((c:any)=>({ id: c.id, title: c.title, thumbnail: c.thumbnail, lastVisited: c.lastVisited })));
+    setChannels(ch.map((c: any) => ({ id: c.id, title: c.title, thumbnail: c.thumbnail, lastVisited: c.lastVisited })));
   }
 
   function toggleFav(id: string) {
@@ -112,7 +112,7 @@ export default function ChannelsHome() {
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
-           <div className="win-inset bg-white p-2 mb-4">
+      <div className="win-inset bg-white p-2 mb-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl italic font-black text-slate-800 tracking-tighter">
             <span className="text-blue-700">Tube</span>Come

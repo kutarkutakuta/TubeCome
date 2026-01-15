@@ -1,6 +1,6 @@
 {
-  "name": "TubeCome - YouTubeコメントビューア",
-  "short_name": "TubeCome",
+  "name": "ちゅーこめ - YouTubeコメントビューア",
+  "short_name": "ちゅーこめ",
   "description": "某大型掲示板風インターフェイスでYouTubeコメントを閲覧できる軽量アプリケーションです。",
   "start_url": "/",
   "scope": "/",

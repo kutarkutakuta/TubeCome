@@ -1,8 +1,8 @@
 {
   "packageId": "com.onrender.tubecome.twa",
   "host": "tubecome.onrender.com",
-  "name": "TubeCome - YouTube コメントビューア",
-  "launcherName": "TubeCome",
+  "name": "ちゅーこめ - YouTube コメントビューア",
+  "launcherName": "ちゅーこめ",
   "display": "standalone",
   "themeColor": "#3B82F6",
   "themeColorDark": "#000000",
