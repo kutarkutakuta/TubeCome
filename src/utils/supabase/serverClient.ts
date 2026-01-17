@@ -11,6 +11,20 @@ if (supabaseUrl && supabaseKey) {
   console.warn('SUPABASE_SERVICE_ROLE_KEY or SUPABASE_URL not set; quota logging will be no-op');
 }
 
+// 日本語: 集計日ラベル（YYYY-MM-DD）を JST（日本時間）基準で返します。
+// 日本時間の「17:00」を日次の切替時刻（開始時刻）とし、17:00〜翌17:00 を 1 日として扱います。
+// 例: 2026-01-02 03:00 JST は 2026-01-01 の集計日に含まれます。
+const getAggregationDateInJST = (date = new Date()): string => {
+  // JST 相当に変換（UTC +9）して、JST の時刻コンポーネントを読むために UTC メソッドを使用します
+  const jst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  const hour = jst.getUTCHours(); // JST 時
+  const target = hour >= 17 ? jst : new Date(jst.getTime() - 24 * 60 * 60 * 1000);
+  const yyyy = target.getUTCFullYear();
+  const mm = String(target.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(target.getUTCDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 export async function logYouTubeQuota(type: string, units = 1, details?: Record<string, any>, clientIp?: string) {
   if (!supabaseAdmin) return { status: 'noop' as const };
 
@@ -29,7 +43,8 @@ export async function logYouTubeQuota(type: string, units = 1, details?: Record<
       }
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    // 日本語: 日付ラベルは JST の 17:00 を起点とした集計日を使用します
+    const today = getAggregationDateInJST();
     await (supabaseAdmin as any).from('youtube_quota_logs').insert({ date: today, type, units, details, client_ip: ip ?? null });
 
     // If IP is available, compute today's total and evaluate thresholds
@@ -84,7 +99,8 @@ export async function logYouTubeQuota(type: string, units = 1, details?: Record<
 export async function getDailyQuotaTotalByIp(clientIp: string) {
   if (!supabaseAdmin) return 0;
   try {
-    const today = new Date().toISOString().slice(0, 10);
+    // 日本語: 当日合計は JST の 17:00〜翌17:00 のウィンドウを '当日' として集計します
+    const today = getAggregationDateInJST();
     const { data, error } = await (supabaseAdmin as any)
       .from('youtube_quota_logs')
       .select('units')
@@ -106,7 +122,8 @@ export async function getDailyQuotaTotalByIp(clientIp: string) {
 export async function getDailyQuotaTotalGlobal() {
   if (!supabaseAdmin) return 0;
   try {
-    const today = new Date().toISOString().slice(0, 10);
+    // 日本語: 全体当日合計も JST の 17:00 を起点とした集計日で集計します
+    const today = getAggregationDateInJST();
     const { data, error } = await (supabaseAdmin as any)
       .from('youtube_quota_logs')
       .select('units')
