@@ -60,8 +60,8 @@ export default function HelpPage() {
           <div className="font-bold text-sm">📉 利用制限</div>
         </div>
         <div className="win-window win-inset p-4">
-          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本アプリケーションで使用している YouTube Data API には日次の使用上限があるため、利用制限を行うことがあります。</p>
-          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">また、利用制限の都合上、古いコメントが一部欠落することがあります。</p>
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">本アプリケーションで使用している YouTube Data API には日次（17時リセット）の使用上限があるため、利用制限を行うことがあります。</p>
+          <p className="text-sm text-[var(--fg-primary)] leading-relaxed">また、使用上限の都合上、古いコメントが一部欠落することがあります。</p>
           <div className="mt-4">
             <QuotaUsageClient />
           </div>
